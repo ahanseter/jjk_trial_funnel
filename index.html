@@ -255,8 +255,8 @@
     <div class="section-head"><span class="section-num">01</span><h2 class="section-title">Executive summary</h2></div>
     <p>Every SMS subscription &mdash; trial or paid &mdash; is meant to end up as a matched order in SAP. That's how JJK counts it, bills it, and routes it to a rep. The reconciliation export SMS runs against SAP's EOI extract exists to catch the ones that don't make it. In the latest three-week window, <b class="mono">771</b> trials landed on that list out of <b class="mono">2,081</b> created &mdash; roughly <b>one in three</b>.</p>
     <p>Looking across all <b class="mono">29,285</b> external trials created this year, three drop-off points are unambiguous. <b class="mono">2.9%</b> never get a user record at all. <b class="mono">14.2%</b> get a user record but <b>no Okta account</b> &mdash; meaning they cannot sign in to the product they just signed up for. And <b class="mono">32.8%</b> never get a SAP order attached. (A fourth measure, profile completion, is in dispute &mdash; see Section 03.)</p>
-    <p><b>The single largest finding is a step-change in April.</b> SAP order creation ran at 70&ndash;74% through Q1, then fell to 55&ndash;59% in April and stayed there for four months. Okta provisioning, by contrast, has been flat all year. Something changed in April that is still costing roughly <b>15 points of order conversion on every trial</b>.</p>
-    <p>Two specific days broke outright. On <b>July 9</b>, Okta provisioning failed for ~57 people in three concentrated hourly windows &mdash; worst at 22:00, where only 2 of 22 trials got an account &mdash; while SAP ran normally. On <b>July 15&ndash;16</b>, the reverse: Okta was flawless and SAP order creation collapsed to under 4%, leaving ~200 trials with no order that appear never to have been backfilled.</p>
+    <p><b>The single largest finding is a step-change in April.</b> SAP order creation ran at 70&ndash;74% through Q1, then fell to 55&ndash;59% in April and stayed there for four months. Okta provisioning, by contrast, has been flat all year. Something changed in April that is still costing roughly <b>15 points of order conversion on every trial</b>. A candidate has since emerged &mdash; the April promo-code release triggered duplicate verification emails to ~10,000 recipients &mdash; but it has not been shown to account for the whole drop.</p>
+    <p>Two specific days broke outright. On <b>July 9</b>, Okta provisioning failed for ~57 people in three concentrated hourly windows &mdash; worst at 22:00, where only 2 of 22 trials got an account &mdash; while SAP ran normally. Marketing has since confirmed the Acoustic email template was changed <em>that same day</em>, which would explain it: no click, no Okta account. On <b>July 15&ndash;16</b>, the reverse pattern &mdash; Okta flawless, SAP order creation collapsed to under 4%, leaving ~200 trials with no order that appear never to have been backfilled.</p>
     <p>Within the EOI export itself, the stuck trials don't recover on their own: <b class="mono">752 of 768</b> are still on a trial subscription type today and <b class="mono">647</b> have run past their end date without converting.</p>
     <p>Finally, this report documents what <em>isn't</em> measured &mdash; promo-click attribution and verification-email engagement have no connected data source in this pass. Section 07 lists each gap.</p>
   </div>
@@ -367,6 +367,10 @@
   <div class="callout">
     <b>The April step-change is the story in this chart.</b> Okta account creation is flat all year (81&ndash;85%, easing to 78.8% in August). SAP order creation, by contrast, ran at <b>70&ndash;74% through Q1</b> and then dropped to <b>55&ndash;59% from April onward</b> &mdash; and stayed there for four months. That is not gradual decay; it looks like something changed in April. Whatever it was, it is costing roughly <b>15 points of order conversion on every trial since</b>. August's partial recovery to 67.7% is worth understanding too.
   </div>
+
+  <div class="callout finding">
+    <b>A candidate cause emerged on Aug 27.</b> The promo-code feature shipped in <b>April</b> &mdash; the same month as the step-change &mdash; and its Acoustic send wrote to a column that did not exist. Every send therefore returned an error, and the retry fired five minutes later, producing <b>duplicate verification emails to roughly 10,000 recipients</b>. Duplicate sends depress click-through directly (people click one link, not three) and plausibly depress completion too. <b>This is a strong lead, not a proven cause</b> &mdash; the exact start and end dates have not been pinned down, so no one has yet shown it accounts for the full 15-point drop. Confirming those dates is the fastest way to test it.
+  </div>
 </section>
 
 <section>
@@ -386,6 +390,10 @@
 
   <div class="callout finding">
     <b>July 9 was an Okta problem, not a SAP problem.</b> The failure is concentrated in three windows &mdash; 16:00, 17:00, and most severely 22:00, where <b>only 2 of 22 trials</b> got an Okta account. SAP order creation that same day ran at 71%, <em>above</em> the monthly average, so the order path was healthy throughout. Roughly <b>57 people</b> who started a trial on July 9 ended up with a subscription and an order but <b>no way to sign in</b>. Those accounts are individually recoverable if someone provisions them.
+  </div>
+
+  <div class="callout">
+    <b>And July 9 has a confirmed upstream event.</b> Marketing confirmed on Aug 27 that the <b>Acoustic email template was changed on July 9</b>, altering where recipients could click. That gives a coherent chain: a changed template &rarr; fewer verification-email clicks &rarr; fewer Okta accounts created. It fits the timing exactly and explains why SAP was untouched while Okta was not. <b>It is not yet proven</b> &mdash; comparing Acoustic click rates for July 8 against July 9 would settle it quickly, and that data was not available for this report.
   </div>
 
   <div class="callout finding">
@@ -572,13 +580,46 @@
 </section>
 
 <section>
-  <div class="section-head"><span class="section-num">08</span><h2 class="section-title">Recommendations</h2></div>
+  <div class="section-head"><span class="section-num">08</span><h2 class="section-title">Issue register</h2></div>
+  <p class="lede">Every known issue in one place, with what broke, when it started, and whether it is closed &mdash; the format agreed in the Aug 27 process-mapping session. Maintained as a shared spreadsheet; this table is the snapshot.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Issue</th><th>Bucket</th><th>Started</th><th>Status</th><th>Evidence</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">TF-06</td><td><b>SAP order rate step-change</b> &mdash; 73% &rarr; 56%, four months</td><td>SAP</td><td>April 2026</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Measured</td></tr>
+        <tr><td class="mono">TF-05</td><td><b>SAP outage</b> &mdash; ~200 trials, no order, never backfilled</td><td>SAP</td><td>Jul 15&ndash;16</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Measured</td></tr>
+        <tr><td class="mono">TF-04</td><td><b>Okta provisioning failure</b> &mdash; ~57 users stranded</td><td>Okta</td><td>Jul 9</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Measured</td></tr>
+        <tr><td class="mono">TF-07</td><td><b>Chronic Okta gap</b> &mdash; 14.2% of trials, all year</td><td>Okta</td><td>Pre-2026</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Measured</td></tr>
+        <tr><td class="mono">TF-10</td><td><b>Elastic RUM records no page views</b></td><td>Observability</td><td>90+ days</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Measured</td></tr>
+        <tr><td class="mono">TF-11</td><td><b>&ldquo;Profile completed&rdquo; defined two ways</b> &mdash; 95% vs 25%</td><td>Definition</td><td>&mdash;</td><td><span class="status-pill missing"><i class="dot"></i>Blocks analysis</span></td><td>Measured</td></tr>
+        <tr><td class="mono">TF-01</td><td><b>Duplicate verification emails</b> &mdash; ~10,000 recipients</td><td>Acoustic</td><td>April 2026</td><td><span class="status-pill partial"><i class="dot"></i>Partly fixed</span></td><td>Reported</td></tr>
+        <tr><td class="mono">TF-02</td><td><b>Retry does not inspect the error</b> &mdash; will recur if codes return</td><td>Acoustic</td><td>April 2026</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Reported</td></tr>
+        <tr><td class="mono">TF-03</td><td><b>Acoustic template changed</b> &mdash; new click targets</td><td>Acoustic</td><td>Jul 9</td><td><span class="status-pill partial"><i class="dot"></i>Investigating</span></td><td>Confirmed</td></tr>
+        <tr><td class="mono">TF-08</td><td>Call-to-action below the fold at common zoom levels</td><td>Acoustic</td><td>Unknown</td><td><span class="status-pill partial"><i class="dot"></i>Unverified</span></td><td>From memory</td></tr>
+        <tr><td class="mono">TF-09</td><td>Okta login loop</td><td>Okta</td><td>Unknown</td><td><span class="status-pill partial"><i class="dot"></i>Unverified</span></td><td>From memory</td></tr>
+        <tr><td class="mono">TF-12</td><td>Pendo Analytics not licensed</td><td>Observability</td><td>&mdash;</td><td><span class="status-pill live"><i class="dot"></i>Won't fix</span></td><td>Confirmed</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <b>Read the evidence column before acting on a row.</b> <em>Measured</em> means taken directly from the production database or Elastic and reproducible. <em>Confirmed</em> means a person with access verified it. <em>Reported</em> means described in the Aug 27 session but not independently checked. <em>From memory</em> means raised in discussion with no date and no data attached &mdash; TF-08 and TF-09 may not be live issues at all. Mixing these tiers is how a register stops being trustworthy.
+  </div>
+
+  <div class="callout finding">
+    <b>Six of the twelve have no owner</b> &mdash; including TF-06, the largest single issue in this report, and TF-05, where ~200 orders were never created. The Aug 27 session assigned investigation work but not these.
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><span class="section-num">09</span><h2 class="section-title">Recommendations</h2></div>
   <p class="lede">Roughly in priority order &mdash; the first two are cheap and point straight at the biggest number here.</p>
   <div class="reco-list">
     <div class="reco">
       <div class="reco-num">01</div><div class="reco-badge"><span class="badge now">Now</span></div>
-      <div class="reco-body"><h3>Find out what changed in April</h3>
-      <p>SAP order creation dropped from ~73% to ~56% between March and April and has not recovered. On current volumes that is several hundred lost orders a month. Start with the April release notes and any SAP or middleware change in that window &mdash; this one finding likely outweighs everything else in this report.</p></div>
+      <div class="reco-body"><h3>Pin the exact start and end dates of the duplicate-email window</h3>
+      <p>This is now the fastest test of the April step-change. If duplicate sends began with the April promo-code release and stopped when the missing column was added in late August, the dates should line up against the SAP order rate &mdash; and if they don't, the real April cause is still out there. Either answer is progress; right now TF-06 has a candidate and no verdict.</p></div>
     </div>
     <div class="reco">
       <div class="reco-num">02</div><div class="reco-badge"><span class="badge now">Now</span></div>
@@ -587,31 +628,36 @@
     </div>
     <div class="reco">
       <div class="reco-num">03</div><div class="reco-badge"><span class="badge now">Now</span></div>
+      <div class="reco-body"><h3>Fix the retry logic, not just the missing column (TF-02)</h3>
+      <p>Adding the column stopped today's duplicates, but the send still retries without checking <em>which</em> error it received. Re-enable promo codes and the same duplicate storm returns. This is currently logged as fixed; it is half-fixed, and the remaining half is the durable one.</p></div>
+    </div>
+    <div class="reco">
+      <div class="reco-num">04</div><div class="reco-badge"><span class="badge next">Next</span></div>
       <div class="reco-body"><h3>Settle what &ldquo;profile completed&rdquo; actually means</h3>
       <p>This report's location-address proxy says 95% incomplete; the EOI export's own column says 25%. Until someone reconciles those definitions, no one should act on either number &mdash; and the profile stage can't be trusted in any funnel view.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">04</div><div class="reco-badge"><span class="badge next">Next</span></div>
+      <div class="reco-num">05</div><div class="reco-badge"><span class="badge next">Next</span></div>
       <div class="reco-body"><h3>Alert on daily Okta and SAP completion rates</h3>
       <p>All four incident days in Section 04 were plainly visible in a daily rate and none appear to have been caught at the time. A simple threshold alert (say, either rate below 70% for a day) would have surfaced every one of them.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">05</div><div class="reco-badge"><span class="badge next">Next</span></div>
+      <div class="reco-num">06</div><div class="reco-badge"><span class="badge next">Next</span></div>
       <div class="reco-body"><h3>Work the 104 recoverable records from the EOI export</h3>
       <p>These already have a SAP account <em>and</em> an order &mdash; only the link back to SMS is missing. Highest-value, lowest-effort segment in the export, and a bounded list.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">06</div><div class="reco-badge"><span class="badge next">Next</span></div>
+      <div class="reco-num">07</div><div class="reco-badge"><span class="badge next">Next</span></div>
       <div class="reco-body"><h3>Validate address and region/country at profile-save time</h3>
       <p>Blank addresses and invalid region/country pairs account for most of the 33 blocked-but-matched records. Both are catchable in SMS before SAP ever sees the record.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">07</div><div class="reco-badge"><span class="badge later">Later</span></div>
+      <div class="reco-num">08</div><div class="reco-badge"><span class="badge later">Later</span></div>
       <div class="reco-body"><h3>Investigate the chronic 14% Okta gap</h3>
       <p>Beyond the incident days, roughly one in seven trials never gets an Okta account at all &mdash; a rate that has held steady all year. Worth understanding whether these are abandoned signups or silent provisioning failures.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">08</div><div class="reco-badge"><span class="badge later">Later</span></div>
+      <div class="reco-num">09</div><div class="reco-badge"><span class="badge later">Later</span></div>
       <div class="reco-body"><h3>Fix Elastic RUM transaction capture &mdash; it is the cheapest route to front-end visibility</h3>
       <p>The browser agent is already deployed, licensed and reporting; it just isn't recording page views (&sect;07). If the <span class="mono">apm.init()</span> placement is the cause, this is a small change that unlocks the profile-form question, the signup funnel, and front-end performance data at once. Pendo can't fill this gap &mdash; JJK doesn't license Analytics &mdash; and Acoustic remains the only route to email-verification data.</p></div>
     </div>
@@ -620,11 +666,13 @@
 
 <section>
   <div class="col">
-    <div class="section-head"><span class="section-num">09</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
+    <div class="section-head"><span class="section-num">10</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
     <p><b>Sources.</b> (1) <span class="mono">stuck-sms-no-sap-order_EOI_Match.xlsx</span> &mdash; a SAP BI EOI reconciliation export covering Jul 27 &ndash; Aug 18, 2026; 771 data rows. (2) Read-only queries against the SMS production database, authenticated via Azure AD; no credentials stored or transmitted.</p>
     <p><b>The export is a filtered list, not the full population.</b> It contains SMS subscriptions flagged as having no SAP order. SMS-wide, 2,081 trial subscriptions were created in the same window, so the 771 records represent about 37% of trials &mdash; every percentage in Section 03 is a share of that stuck subset, not of all trials.</p>
     <p><b>External vs. internal.</b> Records with an <span class="mono">@jjkeller.com</span> email are treated as internal (17 of 771) and excluded from Section 03 percentages.</p>
     <p><b>Match terminology</b> reflects the export's own <span class="mono">Match Status</span> column as produced by the existing reconciliation job; this report did not re-derive match logic independently.</p>
+    <p><b>Evidence tiers.</b> Findings in this report come from three sources and are labelled as such throughout. <b>Measured</b> &mdash; queried directly from the SMS production database or prod Elastic, reproducible from the definitions below. <b>Confirmed</b> &mdash; verified by a person with access to a system this report cannot reach (e.g. marketing confirming the Jul 9 Acoustic template change). <b>Reported</b> &mdash; described in the Aug 27 process-mapping session and not independently checked. Where a cause is inferred rather than demonstrated it is written as a hypothesis and says so; the Jul 9 template &rarr; Okta chain and the April promo-code &rarr; SAP chain are both plausible and both unproven.</p>
+    <p><b>Meeting-sourced material</b> comes from the Aug 27 process-mapping follow-up transcript. Speaker attribution in that transcript is unreliable (turns interleave), so this report attributes claims to the session rather than to named individuals.</p>
     <p><b>Stage definitions.</b> Okta account = <span class="mono">JJK.User.OktaId</span> populated. SAP order = <span class="mono">Auth.SubscriptionDetails.SAPOrderID</span> populated. Location address = a non-deleted <span class="mono">CompanyData.Location</span> row with both <span class="mono">Address1</span> and <span class="mono">City</span> non-empty. Stages are evaluated <b>independently</b>, not as a strict sequence &mdash; trials routinely clear one stage while failing an earlier one.</p>
     <p><b>Provisioning lag guard.</b> Section 03 and the sample CSV exclude trials created after Aug 23 so that asynchronous Okta and SAP provisioning still in flight is not counted as permanent failure. An earlier cut without this guard showed a spike of &ldquo;no Okta account&rdquo; records dated the same day the query ran &mdash; provisioning lag, not failure.</p>
     <p><b>Not included:</b> Pendo (JJK does not license Pendo Analytics &mdash; unavailable by subscription), Acoustic, and Google Analytics (no connected data source for this pass). Those stages are marked as gaps rather than estimated. Okta was originally expected to be a gap but proved readable from the SMS database via the user record's Okta ID. Elastic APM RUM and Application Insights are instrumented in the SMS SPA but were not queried for this pass; they are the most likely route to the front-end engagement data Pendo would have supplied.</p>
