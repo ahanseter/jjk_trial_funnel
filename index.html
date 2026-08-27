@@ -275,7 +275,8 @@
     <p><b>The single largest finding is a step-change in April.</b> SAP order creation ran at 70&ndash;74% through Q1, then fell to 55&ndash;59% in April and stayed there for four months. Okta provisioning, by contrast, has been flat all year. Something changed in April that is still costing roughly <b>15 points of order conversion on every trial</b>. A candidate has since emerged &mdash; the April promo-code release triggered duplicate verification emails to ~10,000 recipients &mdash; but it has not been shown to account for the whole drop.</p>
     <p>Two specific days broke outright. On <b>July 9</b>, Okta provisioning failed for ~57 people in three concentrated hourly windows &mdash; worst at 22:00, where only 2 of 22 trials got an account &mdash; while SAP ran normally. Marketing has since confirmed the Acoustic email template was changed <em>that same day</em>, which would explain it: no click, no Okta account. On <b>July 15&ndash;16</b>, the reverse pattern &mdash; Okta flawless, SAP order creation collapsed to under 4%, leaving ~200 trials with no order that appear never to have been backfilled.</p>
     <p>Within the EOI export itself, the stuck trials don't recover on their own: <b class="mono">752 of 768</b> are still on a trial subscription type today and <b class="mono">647</b> have run past their end date without converting.</p>
-    <p>Finally, this report documents what <em>isn't</em> measured &mdash; promo-click attribution and verification-email engagement have no connected data source in this pass. Section 08 lists each gap.</p>
+    <p><b>Separately &mdash; and this is the part most likely to be misread &mdash; volume and conversion are two different problems.</b> Trials are down 45% since January, but SAP lead records are down 46% over the same period. Those moving together means the decline starts <em>above</em> the sign-up form: it is a demand problem, driven by paid-search volume falling ~57% and one agency campaign dropping 98%. The engineering faults below are real and cost real orders, but they are not what halved the volume, and fixing them will not bring it back. Section 08 separates the two.</p>
+    <p>Finally, this report documents what <em>isn't</em> measured. Stages 3 and 4 of the flow &mdash; the entire email-verification window &mdash; emit no telemetry at all, so anyone who abandons there leaves no trace in any system. Section 09 lists every gap.</p>
   </div>
 </section>
 
@@ -648,18 +649,74 @@
   </div>
 
   <div class="callout">
-    <b>Two things worth noting.</b> First, trial volume is <b>down roughly 55%</b> across the year &mdash; from a ~1,050/week plateau through Q1 to ~440&ndash;570/week in August. That decline is outside the scope of this report but probably deserves its own look. Second, with trials making up <b>93.6%</b> of all new subscriptions and only <b class="mono">13,514</b> of <b class="mono">299,809</b> companies on a paid plan, the trial&rarr;paid step is where nearly all of SMS's conversion risk sits.
+    <b>Two things worth noting.</b> First, trial volume is <b>down roughly 45%</b> across the year &mdash; and Section 08 shows why: it is a demand problem, not a funnel problem. Second, with trials making up <b>93.6%</b> of all new subscriptions and only <b class="mono">13,514</b> of <b class="mono">299,809</b> companies on a paid plan, the trial&rarr;paid step is where nearly all of SMS's conversion risk sits.
   </div>
 </section>
 
 <section>
-  <div class="section-head"><span class="section-num">08</span><h2 class="section-title">Data source coverage</h2></div>
+  <div class="section-head"><span class="section-num">08</span><h2 class="section-title">Where the volume went</h2></div>
+  <p class="lede">23,571 SAP lead records, Jan 1 &ndash; Aug 26, 2026, with campaign attribution. This is the only dataset here that reaches above the sign-up form &mdash; and it separates two problems that have been getting conflated.</p>
+
+  <div class="chart-card">
+    <div class="chart-title">Monthly leads vs. trials, 2026</div>
+    <div class="chart-sub">Both fall by the same proportion &mdash; the funnel isn't leaking more, fewer people are arriving</div>
+    <div class="stack-chart">
+      <div class="stack-row"><div class="stack-label"><span>Jan</span><b>3,546 leads &middot; 4,034 trials</b></div><div class="stack-track" style="background:transparent;gap:4px"><div class="stack-seg" style="width:88.2%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>Feb</span><b>3,397 &middot; 4,040</b></div><div class="stack-track" style="background:transparent;gap:4px"><div class="stack-seg" style="width:84.5%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>Mar</span><b>4,022 &middot; 4,514</b></div><div class="stack-track" style="background:transparent;gap:4px"><div class="stack-seg" style="width:100%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>Apr</span><b>3,160 &middot; 4,539</b></div><div class="stack-track" style="background:transparent;gap:4px"><div class="stack-seg" style="width:78.6%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>May</span><b>2,590 &middot; 3,786</b></div><div class="stack-track" style="background:transparent;gap:4px"><div class="stack-seg" style="width:64.4%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>Jun</span><b>2,829 &middot; 3,781</b></div><div class="stack-track" style="background:transparent;gap:4px"><div class="stack-seg" style="width:70.3%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>Jul</span><b>2,101 &middot; 2,829</b></div><div class="stack-track" style="background:transparent;gap:4px"><div class="stack-seg" style="width:52.2%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>Aug<span style="color:var(--ink-muted)"> (to 26th)</span></span><b>1,926 &middot; 2,220</b></div><div class="stack-track" style="background:transparent;gap:4px"><div class="stack-seg" style="width:47.9%;background:var(--s-sap);border-radius:5px"></div></div></div>
+    </div>
+    <div class="chart-legend"><span><i class="swatch" style="background:var(--s-sap)"></i>Leads per month, scaled to the March peak</span></div>
+  </div>
+
+  <div class="callout finding">
+    <b>Trials are down 45%. Leads are down 46%.</b> Those two numbers moving together is the finding. If the funnel were breaking down, trials would fall faster than leads &mdash; they don't. <b>The volume decline is a demand problem that starts above the sign-up form</b>, and no amount of funnel repair will recover it. The engineering faults in this report are real and cost real orders, but they are not what halved the volume.
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Campaign</th><th class="num">Q1 avg/mo</th><th class="num">Aug</th><th class="num">Change</th></tr></thead>
+      <tbody>
+        <tr><td>TM SMS CM Trial placement Agency</td><td class="num">391</td><td class="num">6</td><td class="num" style="color:var(--critical)"><b>&minus;98%</b></td></tr>
+        <tr><td>SMS &mdash; PPC &mdash; ToolboxTalks &mdash; Bing</td><td class="num">350</td><td class="num">90</td><td class="num" style="color:var(--critical)">&minus;74%</td></tr>
+        <tr><td>SMS &mdash; PPC &mdash; Chemical &mdash; Google</td><td class="num">261</td><td class="num">104</td><td class="num" style="color:var(--critical)">&minus;60%</td></tr>
+        <tr><td>SMS &mdash; PPC &mdash; Chemical &mdash; Bing</td><td class="num">346</td><td class="num">154</td><td class="num" style="color:var(--critical)">&minus;55%</td></tr>
+        <tr><td>SMS &mdash; PPC &mdash; SafetyPlans &mdash; Bing</td><td class="num">320</td><td class="num">155</td><td class="num" style="color:var(--critical)">&minus;52%</td></tr>
+        <tr><td>Online services default / no code entered</td><td class="num">200</td><td class="num">95</td><td class="num" style="color:var(--critical)">&minus;52%</td></tr>
+        <tr><td>SMS &mdash; PPC &mdash; Safety Plans &mdash; Google</td><td class="num">249</td><td class="num">131</td><td class="num" style="color:var(--critical)">&minus;47%</td></tr>
+        <tr><td>SMS &mdash; PPC &mdash; Audits &mdash; Bing</td><td class="num">163</td><td class="num">87</td><td class="num" style="color:var(--critical)">&minus;47%</td></tr>
+        <tr><td>LG &mdash; WPS &mdash; General</td><td class="num">177</td><td class="num">190</td><td class="num" style="color:var(--good)">+7%</td></tr>
+        <tr><td>TM SMS trial placement Agency</td><td class="num">30</td><td class="num">164</td><td class="num" style="color:var(--good)">+447%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <b>The decline is broad, with one outlier.</b> Paid search fell roughly evenly across both networks &mdash; Bing 1,135&rarr;492 (&minus;57%), Google 826&rarr;351 (&minus;58%) &mdash; which looks like reduced spend or reduced bidding rather than any single campaign failing. The exception is <b>TM SMS CM Trial placement Agency</b>, which went from ~391/month in Q1 to <b>6 in August</b>, collapsing in May. A similarly-named campaign (<em>TM SMS trial placement Agency</em>) rose from 30 to 164 over the same period, so this is probably a rename or re-contract &mdash; but the replacement is running at roughly <b>40% of the original volume</b>, a net loss of ~200 leads/month. Someone in marketing will know in a minute whether that was deliberate.
+  </div>
+
+  <div class="callout finding">
+    <b>The lead-to-trial ratio independently confirms the April step-change.</b> Leads are created in SAP <em>downstream</em> of the trial order, so if SAP order creation breaks, lead records go missing too. That is exactly what the ratio shows: leads as a share of trials ran <b>84&ndash;89% in Jan&ndash;Mar</b>, dropped to <b>68&ndash;75% from April</b>, and recovered to <b>87% in August</b> &mdash; tracking the measured SAP order rate (73%&rarr;56%&rarr;68%) almost exactly, from a completely separate dataset. Two independent sources agreeing on the same April break and the same August recovery is the strongest evidence in this report that the step-change is real.
+  </div>
+
+  <div class="callout">
+    <b>So there are two distinct problems, and they compound.</b> <b>(1) Demand</b> &mdash; roughly 45% fewer people are starting trials, driven by paid-search volume and the agency campaign change. That is a marketing question. <b>(2) Conversion</b> &mdash; since April, ~15 points fewer of those who do start end up as a counted order. That is an engineering question. Fixing the funnel will not bring the volume back; restoring the spend will not fix the leak. They need separate owners.
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><span class="section-num">09</span><h2 class="section-title">Data source coverage</h2></div>
   <p class="lede">What's wired into this report versus what the whiteboard walkthrough calls for.</p>
   <div class="table-wrap">
     <table>
       <thead><tr><th>Source</th><th>Funnel stage</th><th>Status</th><th>Notes</th></tr></thead>
       <tbody>
         <tr><td>SMS production DB</td><td>Trial creation, profile completion, live status</td><td><span class="status-pill live"><i class="dot"></i>Live</span></td><td>Read-only queries against the SMS production database via Azure AD</td></tr>
+        <tr><td>SAP BI leads export</td><td>Marketing attribution, lead creation</td><td><span class="status-pill live"><i class="dot"></i>Live</span></td><td>23,571 lead records with campaign and promo code, Jan&ndash;Aug 2026. Manual <span class="mono">.xlsx</span> export.</td></tr>
         <tr><td>SAP BI EOI export</td><td>Order match / creation</td><td><span class="status-pill live"><i class="dot"></i>Live</span></td><td>Manual <span class="mono">.xlsx</span> export today; used the Jul 27 &ndash; Aug 18 pull</td></tr>
         <tr><td>Pendo</td><td>Trial-start click, profile-form engagement</td><td><span class="status-pill missing"><i class="dot"></i>No SMS data</span></td><td>API and aggregation both work. But across three years and all event types, only the Encompass app reports data &mdash; SMS has <b>119 pages tagged and zero events, ever</b>. Analytics is licensed for Encompass, not SMS.</td></tr>
         <tr><td>Elastic APM (RUM)</td><td>Profile-form page views and interactions</td><td><span class="status-pill missing"><i class="dot"></i>Capturing no page views</span></td><td>Agent is live in prod but records <b>zero transactions</b> &mdash; see the finding below. Errors only.</td></tr>
@@ -683,8 +740,8 @@
 </section>
 
 <section>
-  <div class="section-head"><span class="section-num">09</span><h2 class="section-title">Issue register</h2></div>
-  <p class="lede">All fourteen known issues in one place, with what broke, when it started, and whether it is closed &mdash; the format agreed in the Aug 27 process-mapping session. Maintained as a shared spreadsheet; this table is the snapshot.</p>
+  <div class="section-head"><span class="section-num">10</span><h2 class="section-title">Issue register</h2></div>
+  <p class="lede">All fifteen known issues in one place, with what broke, when it started, and whether it is closed &mdash; the format agreed in the Aug 27 process-mapping session. Maintained as a shared spreadsheet; this table is the snapshot.</p>
 
   <div class="table-wrap">
     <table>
@@ -702,6 +759,7 @@
         <tr><td class="mono">TF-08</td><td>Call-to-action below the fold at common zoom levels</td><td>Acoustic</td><td>Unknown</td><td><span class="status-pill partial"><i class="dot"></i>Unverified</span></td><td>From memory</td></tr>
         <tr><td class="mono">TF-09</td><td>Okta login loop</td><td>Okta</td><td>Unknown</td><td><span class="status-pill partial"><i class="dot"></i>Unverified</span></td><td>From memory</td></tr>
         <tr><td class="mono">TF-12</td><td>Pendo carries no SMS data &mdash; 119 pages tagged, zero events</td><td>Observability</td><td>&mdash;</td><td><span class="status-pill partial"><i class="dot"></i>By licence</span></td><td>Measured</td></tr>
+        <tr><td class="mono">TF-15</td><td><b>Lead volume down 46%</b> &mdash; paid search &minus;57%, agency campaign &minus;98%</td><td>Demand</td><td>Q1&rarr;Aug 2026</td><td><span class="status-pill missing"><i class="dot"></i>Open &mdash; marketing</span></td><td>Measured</td></tr>
         <tr><td class="mono">TF-13</td><td><b>Stages 3&ndash;4 emit no telemetry</b> &mdash; verification window leaves no trace anywhere</td><td>Observability</td><td>By design</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Confirmed</td></tr>
         <tr><td class="mono">TF-14</td><td><b>Trial length inconsistent</b> &mdash; 7 days in base config vs 30 days in marketing copy</td><td>Configuration</td><td>Unknown</td><td><span class="status-pill missing"><i class="dot"></i>Needs decision</span></td><td>Confirmed</td></tr>
       </tbody>
@@ -713,56 +771,61 @@
   </div>
 
   <div class="callout finding">
-    <b>Six of the fourteen have no owner</b> &mdash; including TF-06, the largest single issue in this report, and TF-05, where ~200 orders were never created. The Aug 27 session assigned investigation work but not these.
+    <b>Seven of the fifteen have no owner</b> &mdash; including TF-06, the largest single issue in this report, and TF-05, where ~200 orders were never created. The Aug 27 session assigned investigation work but not these.
   </div>
 </section>
 
 <section>
-  <div class="section-head"><span class="section-num">10</span><h2 class="section-title">Recommendations</h2></div>
+  <div class="section-head"><span class="section-num">11</span><h2 class="section-title">Recommendations</h2></div>
   <p class="lede">Roughly in priority order &mdash; the first two are cheap and point straight at the biggest number here.</p>
   <div class="reco-list">
     <div class="reco">
       <div class="reco-num">01</div><div class="reco-badge"><span class="badge now">Now</span></div>
+      <div class="reco-body"><h3>Ask marketing what happened to paid search and the agency placement</h3>
+      <p>This is the largest single number in the report and it is not an engineering issue. Paid search leads fell ~57% across Bing and Google, and <em>TM SMS CM Trial placement Agency</em> went from ~391/month to 6. If those were deliberate budget decisions, the volume decline is explained and the engineering work should be scoped accordingly. If they weren't, that is the most valuable thing anyone finds this week.</p></div>
+    </div>
+    <div class="reco">
+      <div class="reco-num">02</div><div class="reco-badge"><span class="badge now">Now</span></div>
       <div class="reco-body"><h3>Pin the exact start and end dates of the duplicate-email window</h3>
       <p>This is now the fastest test of the April step-change. If duplicate sends began with the April promo-code release and stopped when the missing column was added in late August, the dates should line up against the SAP order rate &mdash; and if they don't, the real April cause is still out there. Either answer is progress; right now TF-06 has a candidate and no verdict.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">02</div><div class="reco-badge"><span class="badge now">Now</span></div>
+      <div class="reco-num">03</div><div class="reco-badge"><span class="badge now">Now</span></div>
       <div class="reco-body"><h3>Backfill the July 15&ndash;16 SAP outage and provision the July 9 Okta accounts</h3>
       <p>Two bounded, known lists: ~200 trials with no order from the SAP outage, and ~57 people from July 9 who have a subscription but no way to sign in. Both look recoverable by hand, and neither appears to have been cleaned up.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">03</div><div class="reco-badge"><span class="badge now">Now</span></div>
+      <div class="reco-num">04</div><div class="reco-badge"><span class="badge now">Now</span></div>
       <div class="reco-body"><h3>Fix the retry logic, not just the missing column (TF-02)</h3>
       <p>Adding the column stopped today's duplicates, but the send still retries without checking <em>which</em> error it received. Re-enable promo codes and the same duplicate storm returns. This is currently logged as fixed; it is half-fixed, and the remaining half is the durable one.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">04</div><div class="reco-badge"><span class="badge next">Next</span></div>
+      <div class="reco-num">05</div><div class="reco-badge"><span class="badge next">Next</span></div>
       <div class="reco-body"><h3>Attack profile completion as a conversion problem</h3>
       <p>Now that stage 6 is confirmed as the trigger for everything downstream, this stops being an integration question and becomes a form-design one: shorten it, pre-fill what sign-up and the promo code already supply, or stage the fields so the order fires earlier. Separately, the two competing definitions of &ldquo;profile complete&rdquo; (95% incomplete by location-address proxy, 25% by the EOI column) still need reconciling before either number is quoted.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">05</div><div class="reco-badge"><span class="badge next">Next</span></div>
+      <div class="reco-num">06</div><div class="reco-badge"><span class="badge next">Next</span></div>
       <div class="reco-body"><h3>Alert on daily Okta and SAP completion rates</h3>
       <p>All four incident days in Section 04 were plainly visible in a daily rate and none appear to have been caught at the time. A simple threshold alert (say, either rate below 70% for a day) would have surfaced every one of them.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">06</div><div class="reco-badge"><span class="badge next">Next</span></div>
+      <div class="reco-num">07</div><div class="reco-badge"><span class="badge next">Next</span></div>
       <div class="reco-body"><h3>Work the 104 recoverable records from the EOI export</h3>
       <p>These already have a SAP account <em>and</em> an order &mdash; only the link back to SMS is missing. Highest-value, lowest-effort segment in the export, and a bounded list.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">07</div><div class="reco-badge"><span class="badge next">Next</span></div>
+      <div class="reco-num">08</div><div class="reco-badge"><span class="badge next">Next</span></div>
       <div class="reco-body"><h3>Validate address and region/country at profile-save time</h3>
       <p>Blank addresses and invalid region/country pairs account for most of the 33 blocked-but-matched records. Both are catchable in SMS before SAP ever sees the record.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">08</div><div class="reco-badge"><span class="badge later">Later</span></div>
+      <div class="reco-num">09</div><div class="reco-badge"><span class="badge later">Later</span></div>
       <div class="reco-body"><h3>Investigate the chronic 14% Okta gap</h3>
       <p>Beyond the incident days, roughly one in seven trials never gets an Okta account at all &mdash; a rate that has held steady all year. Worth understanding whether these are abandoned signups or silent provisioning failures.</p></div>
     </div>
     <div class="reco">
-      <div class="reco-num">09</div><div class="reco-badge"><span class="badge later">Later</span></div>
+      <div class="reco-num">10</div><div class="reco-badge"><span class="badge later">Later</span></div>
       <div class="reco-body"><h3>Fix Elastic RUM transaction capture &mdash; it is the cheapest route to front-end visibility</h3>
       <p>The browser agent is already deployed, licensed and reporting; it just isn't recording page views (&sect;08). If the <span class="mono">apm.init()</span> placement is the cause, this is a small change that unlocks the profile-form question, the signup funnel, and front-end performance data at once. Pendo can't fill this gap &mdash; SMS sends it no data at all &mdash; and Acoustic remains the only route to email-verification data.</p></div>
     </div>
@@ -771,8 +834,8 @@
 
 <section>
   <div class="col">
-    <div class="section-head"><span class="section-num">11</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
-    <p><b>Sources.</b> (1) <span class="mono">stuck-sms-no-sap-order_EOI_Match.xlsx</span> &mdash; a SAP BI EOI reconciliation export covering Jul 27 &ndash; Aug 18, 2026; 771 data rows. (2) Read-only queries against the SMS production database, authenticated via Azure AD; no credentials stored or transmitted.</p>
+    <div class="section-head"><span class="section-num">12</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
+    <p><b>Sources.</b> (0) <span class="mono">Leads And Orders - All Leads.xlsx</span> &mdash; 23,571 SAP lead records with campaign attribution, Jan 1 &ndash; Aug 26, 2026. (1) <span class="mono">stuck-sms-no-sap-order_EOI_Match.xlsx</span> &mdash; a SAP BI EOI reconciliation export covering Jul 27 &ndash; Aug 18, 2026; 771 data rows. (2) Read-only queries against the SMS production database, authenticated via Azure AD; no credentials stored or transmitted.</p>
     <p><b>The export is a filtered list, not the full population.</b> It contains SMS subscriptions flagged as having no SAP order. SMS-wide, 2,081 trial subscriptions were created in the same window, so the 771 records represent about 37% of trials &mdash; every percentage in Section 03 is a share of that stuck subset, not of all trials.</p>
     <p><b>External vs. internal.</b> Records with an <span class="mono">@jjkeller.com</span> email are treated as internal (17 of 771) and excluded from Section 03 percentages.</p>
     <p><b>Match terminology</b> reflects the export's own <span class="mono">Match Status</span> column as produced by the existing reconciliation job; this report did not re-derive match logic independently.</p>
