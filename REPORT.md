@@ -25,9 +25,12 @@ Where a cause is inferred rather than demonstrated, it is written as a hypothesi
 
 **93.6%** of all new SMS subscriptions start as a trial, and only **13,514 of 299,809** companies are on a paid plan. Essentially all of SMS's conversion risk sits in the trial funnel.
 
-**The single largest finding is a step-change in April.** SAP order creation ran at 70–74% through Q1, then fell to 55–59% in April and stayed there for four months. Okta provisioning was flat all year. Something changed in April that is still costing roughly **15 points of order conversion on every trial**.
+> ### ⚠ Active incident — 27 August
+> 116 self-registration trials created, all 116 sent to SAP, **only 23 received a SAP order — 93 stuck (80%)**. The previous day converted 149/185 (81%) and the pipeline normally clears within a day, so this is an **outage in progress, not lag**. Profile completion that day was healthy (86%), isolating the fault to the SAP leg. **These 93 need reconciling, plus any 28 Aug backlog.**
 
-That April break is now visible in **three independent datasets** — SAP order rate, the leads-to-trials ratio, and welcome-email click-through. It is firmly real. **Its cause is unknown.**
+**The April step-change now has an answer.** SAP order creation ran at 70–74% through Q1 and fell to 55–59% from April. The cause was not a bug: it was the **SIGNUP_FLOW_CHANGE rollout**, which made email verification mandatory — from a ~7–9% pilot in Q1 to 72.5% in April and 100% from May. Adding that step introduced a new leak and depressed everything downstream. See §3.
+
+**And the profile step has since been fixed.** Profile completion per account fell from ~75% pre-April to ~57% through May–July, then recovered after the **18 and 25 August deploys** to **84–89%** — better than the pre-April baseline. The clearest win in this report.
 
 **Two days broke outright:**
 - **9 July** — Okta provisioning failed for ~57 people while SAP ran normally
@@ -44,22 +47,23 @@ That April break is now visible in **three independent datasets** — SAP order 
 | § | Section | What's in it |
 |---|---|---|
 | — | [Evidence tiers](#evidence-tiers) | How to read the confidence labels — start here |
-| 1 | [Executive summary](#1-executive-summary) | The findings in one page |
+| 1 | [Executive summary](#1-executive-summary) | The findings in one page, incl. the active 27 Aug outage |
 | 2 | [The end-to-end flow](#2-the-end-to-end-flow) | Nine stages; why stage 6 is a gate and 3–4 are blind |
-| 3 | [Every drop-off point](#3-every-drop-off-point) | 2.9% / 14.2% / 32.8% across 29,285 trials |
-| 4 | [Incident days](#4-incident-days) | The six worst days and what broke on each |
-| 5 | [Timeline of key events](#5-timeline-of-key-events) | Everything known, in order, with evidence tier |
-| 6 | [Inside the EOI reconciliation export](#6-inside-the-eoi-reconciliation-export) | The 771 stuck trials, broken down |
-| 7 | [Volume in context](#7-volume-in-context) | Trials as 93.6% of all new subscriptions |
-| 8 | [Where the volume went](#8-where-the-volume-went) | **Demand vs. conversion** — the two-problem split |
-| 9 | [The welcome email](#9-the-welcome-email) | Acoustic data; the duplicate-send window measured |
-| 10 | [The authentication errors](#10-the-authentication-errors) | **12,000+ failures — the leading April candidate** |
-| 11 | [Data source coverage](#11-data-source-coverage) | What's wired, what's blind, and why |
-| 12 | [Issue register](#12-issue-register) | All 16 issues, plus claims this report reversed |
-| 13 | [Recommendations](#13-recommendations) | Now / Next / Later |
-| 14 | [Methodology & caveats](#14-methodology--caveats) | Sources, exclusions, and known limits |
+| 3 | [What April actually was](#3-what-april-actually-was) | **The verification rollout — the April question, answered** |
+| 4 | [Every drop-off point](#4-every-drop-off-point) | Where trials are lost, measured against all trials |
+| 5 | [Incident days](#5-incident-days) | The worst days and what broke on each |
+| 6 | [Timeline of key events](#6-timeline-of-key-events) | Everything known, in order, with evidence tier |
+| 7 | [Inside the EOI reconciliation export](#7-inside-the-eoi-reconciliation-export) | The 771 stuck trials, broken down |
+| 8 | [Volume in context](#8-volume-in-context) | Trials as 93.6% of all new subscriptions |
+| 9 | [Where the volume went](#9-where-the-volume-went) | **Demand vs. conversion** — the two-problem split |
+| 10 | [The welcome email](#10-the-welcome-email) | Acoustic data; the duplicate-send window measured |
+| 11 | [The authentication errors](#11-the-authentication-errors) | 12,000+ failures on sign-in and sign-up |
+| 12 | [Data source coverage](#12-data-source-coverage) | What's wired, what's blind, and why |
+| 13 | [Issue register](#13-issue-register) | All 20 tracked issues, plus claims this report reversed |
+| 14 | [Recommendations](#14-recommendations) | Now / Next / Later |
+| 15 | [Methodology & caveats](#15-methodology--caveats) | Sources, exclusions, and known limits |
 
-**If you read three things:** §8 (the volume decline is demand, not funnel), §10 (the best remaining lead on April), and §12's *"Claims this report has reversed"*.
+**If you read three things:** the active incident in §1, [§3 on what April actually was](#3-what-april-actually-was), and §13's *"Claims this report has reversed"*.
 
 ---
 
@@ -97,7 +101,35 @@ Base configuration says **7 days**. Marketing copy says **30 days**. The live va
 
 ---
 
-## 3. Every drop-off point
+## 3. What April actually was
+
+A dedicated daily funnel analysis of self-registered users identifies the April change and closes the question this report carried since the first draft.
+
+**April was the SIGNUP_FLOW_CHANGE verification rollout.** A mandatory email-verification step went from a **~7–9% pilot** in Jan–Mar to **72.5% of traffic in April** and **100% from May**. Verification-code volume jumped from ~0.5k/month to ~5–6k/month. A deliberate product change, not a fault — but it added a step, and the funnel lost people at it.
+
+| Ratio | Jan–Mar | May–Jul | After 25 Aug |
+|---|---|---|---|
+| Verified / Gave email | ~43%\* | 77–79% | 75% |
+| **Account / Gave email** | —\* | **56–58%** | 48% |
+| **Completed profile / Account** | 74–76% | **57–58%** | **84–89%** |
+| **SAP trial / Created trial** | ~70% | **51–53%** | 56–81% |
+| Sent-to-SAP / Created trial | 96.7% | 97.1% | 98.2% |
+
+\* Jan–Mar "gave email" counts reflect the small pilot only, not full traffic, so ratios against that denominator are not meaningful for the baseline period. This is why some published Q1 ratios exceed 100%.
+
+**The new leak: ~37% of people who enter an email never reach an account.** Account-per-email ran ~76% in April and settled at **56–58% from May**. The single biggest loss in the funnel, and it did not exist before the rollout. It is also where the **12,000+ authentication failures** (§11) would land — between entering an email and having a working account. Probably the same phenomenon seen from two sides.
+
+**Why a verification step depresses SAP orders.** The SAP submit is **gated on first profile save**, so friction before the profile propagates all the way to order creation: *more friction → fewer completed profiles → fewer SAP orders*. Not a broken integration.
+
+**The 18 and 25 August deploys fixed the profile step.** Completed-profile-per-account moved ~57% (May–Jul) → ~73% (mid-Aug) → **84–89% after 25 Aug** (25 Aug: 77/87 · 26 Aug: 165/196 · 27 Aug: 100/116) — **better than the ~75% pre-April baseline**. The remaining SAP shortfall is now a SAP-leg problem, not a profile problem.
+
+**The SAP leg has its own chronic fault.** Structurally, **20–35% of self-registration trials are marked "sent to SAP" but never receive a SAPOrderID** — a chronic ~32% gap, worsening to ~41–45% since April. Root cause on record: **the SAP submit is a client-side fire-and-forget call with no retry**. Nothing detects or replays a failed submit, which is why these trials sit stuck rather than self-healing, and why 15–16 July and 27 August produced permanent orphans rather than delayed orders.
+
+**Independent corroboration.** This dataset shows 15 July at 2 SAP orders from 107 sent and 16 July at 3 from 98 — matching §5 almost exactly, from a different query against a different population definition.
+
+---
+
+## 4. Every drop-off point
 
 Across all **29,285** external trials created this year:
 
@@ -111,7 +143,7 @@ A fourth measure — profile completion — is in dispute (§12).
 
 ---
 
-## 4. Incident days
+## 5. Incident days
 
 | Date | Trials | What broke | Rate | Normal |
 |---|---|---|---|---|
@@ -130,7 +162,7 @@ The symmetry is informative: the two paths fail **independently**, so a single s
 
 ---
 
-## 5. Timeline of key events
+## 6. Timeline of key events
 
 | Date | Event | Tier |
 |---|---|---|
@@ -152,7 +184,7 @@ The symmetry is informative: the two paths fail **independently**, so a single s
 
 ---
 
-## 6. Inside the EOI reconciliation export
+## 7. Inside the EOI reconciliation export
 
 771 records, 27 Jul – 18 Aug 2026. 17 internal `@jjkeller.com` accounts excluded, leaving **754 external**.
 
@@ -182,7 +214,7 @@ Per §2, the first row is **by design** — profile completion is the trigger. T
 
 ---
 
-## 7. Volume in context
+## 8. Volume in context
 
 | | |
 |---|---|
@@ -193,7 +225,7 @@ Per §2, the first row is **by design** — profile completion is the trigger. T
 
 ---
 
-## 8. Where the volume went
+## 9. Where the volume went
 
 23,571 SAP lead records with campaign attribution, 1 Jan – 26 Aug 2026. The only dataset here that reaches above the sign-up form.
 
@@ -242,7 +274,7 @@ They compound. Fixing the funnel will not bring the volume back; restoring the s
 
 ---
 
-## 9. The welcome email
+## 10. The welcome email
 
 58,543 per-recipient Acoustic events, Oct 2025 – Aug 2026.
 
@@ -297,7 +329,7 @@ It also retires a hypothesis this report previously advanced (§12).
 
 ---
 
-## 10. The authentication errors
+## 11. The authentication errors
 
 Correspondence dated 26–27 Aug 2026 introduces a dataset this report has not seen.
 
@@ -315,7 +347,7 @@ It fits on **timing** (April), **duration** (still ongoing), and **mechanism**. 
 
 ---
 
-## 11. Data source coverage
+## 12. Data source coverage
 
 | Source | Funnel stage | Status | Notes |
 |---|---|---|---|
@@ -352,7 +384,7 @@ The integration key and aggregation API both work. But across **three years** an
 
 ---
 
-## 12. Issue register
+## 13. Issue register
 
 | ID | Issue | Bucket | Started | Status | Tier |
 |---|---|---|---|---|---|
@@ -387,7 +419,7 @@ The integration key and aggregation API both work. But across **three years** an
 
 ---
 
-## 13. Recommendations
+## 14. Recommendations
 
 ### Now
 
@@ -413,7 +445,7 @@ The integration key and aggregation API both work. But across **three years** an
 
 ---
 
-## 14. Methodology & caveats
+## 15. Methodology & caveats
 
 **Sources**
 - `Leads And Orders - All Leads.xlsx` — 23,571 SAP lead records with campaign attribution, 1 Jan – 26 Aug 2026

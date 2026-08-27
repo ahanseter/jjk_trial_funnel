@@ -195,6 +195,21 @@
   .reco-body p{font-size:14.5px;color:var(--ink-2);margin-bottom:0}
   @media (max-width:640px){.reco{grid-template-columns:34px 1fr}.reco-badge{grid-column:2}.reco-body{grid-column:1/-1}}
 
+  /* toc */
+  .toc{margin:30px 0 8px;border:1px solid var(--hairline);border-radius:12px;background:var(--surface);overflow:hidden}
+  .toc-head{padding:15px 22px;border-bottom:1px solid var(--hairline);font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-muted)}
+  .toc ol{list-style:none;margin:0;padding:8px 0;counter-reset:toc}
+  .toc li{counter-increment:toc}
+  .toc a{display:grid;grid-template-columns:44px 1fr;gap:6px;padding:9px 22px;text-decoration:none;color:var(--ink);align-items:baseline}
+  .toc a:hover{background:var(--brand-soft)}
+  .toc a .n{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--gap-ink)}
+  .toc a .t{font-weight:600;font-size:15px}
+  .toc a .d{grid-column:2;font-size:13px;color:var(--ink-2);font-weight:400}
+  .toc a.hot .t{color:var(--critical)}
+  .toc-foot{padding:14px 22px;border-top:1px solid var(--hairline);font-size:13.5px;color:var(--ink-2);background:var(--page)}
+  html{scroll-behavior:smooth}
+  section{scroll-margin-top:18px}
+
   /* timeline */
   .tl{margin:32px 0 8px;position:relative;padding-left:26px}
   .tl::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:var(--hairline)}
@@ -267,12 +282,18 @@
 
 <div class="wrap">
 
-<section>
+<section id="s01">
   <div class="col">
     <div class="section-head"><span class="section-num">01</span><h2 class="section-title">Executive summary</h2></div>
     <p>Every SMS subscription &mdash; trial or paid &mdash; is meant to end up as a matched order in SAP. That's how JJK counts it, bills it, and routes it to a rep. The reconciliation export SMS runs against SAP's EOI extract exists to catch the ones that don't make it. In the latest three-week window, <b class="mono">771</b> trials landed on that list out of <b class="mono">2,081</b> created &mdash; roughly <b>one in three</b>.</p>
     <p>Looking across all <b class="mono">29,285</b> external trials created this year, three drop-off points are unambiguous. <b class="mono">2.9%</b> never get a user record at all. <b class="mono">14.2%</b> get a user record but <b>no Okta account</b> &mdash; meaning they cannot sign in to the product they just signed up for. And <b class="mono">32.8%</b> never get a SAP order attached. (A fourth measure, profile completion, is in dispute &mdash; see Section 03.)</p>
-    <p><b>The single largest finding is a step-change in April.</b> SAP order creation ran at 70&ndash;74% through Q1, then fell to 55&ndash;59% in April and stayed there for four months. Okta provisioning, by contrast, has been flat all year. Something changed in April that is still costing roughly <b>15 points of order conversion on every trial</b>. <b>Three independent datasets now show that April break</b> &mdash; SAP order rate, the leads/trials ratio, and welcome-email click-through &mdash; so it is firmly real. The leading candidate cause, duplicate emails, was tested against the Acoustic data and <b>ruled out</b>: the duplicates ran Jun 17 &ndash; Jul 1, ten weeks after the drop. The cause is currently unknown.</p>
+    <div class="callout finding" style="margin:0 0 22px">
+      <b>Active incident, today.</b> On <b>27 August</b>, 116 self-registration trials were created and all 116 were sent to SAP, but <b>only 23 received a SAP order &mdash; 93 are stuck (80%)</b>. The previous day converted 149 of 185 (81%), and the pipeline normally clears within a day, so this is an <b>outage in progress, not processing lag</b>. Profile completion that day was healthy at 86%, so the fault is isolated to the SAP leg. <b>These 93 trials need reconciling, plus any 28 August backlog.</b>
+    </div>
+
+    <p><b>The April step-change now has an answer.</b> SAP order creation ran at 70&ndash;74% through Q1 and fell to 55&ndash;59% from April. The cause was not a bug: it was the <b>SIGNUP_FLOW_CHANGE rollout</b>, which made email verification mandatory &mdash; from a ~7&ndash;9% pilot in Q1 to 72.5% in April and 100% from May. Adding that step introduced a new leak and depressed everything downstream of it. Earlier drafts of this report called April &ldquo;unexplained&rdquo; and proposed two wrong causes; &sect;03 sets out what actually happened.</p>
+
+    <p><b>And the profile step has since been fixed.</b> Profile completion per account fell from ~75% pre-April to ~57% through May&ndash;July, then recovered sharply after the <b>18 and 25 August deploys</b> to <b>84&ndash;89%</b> &mdash; better than the pre-April baseline. That is the clearest win in this report, and it is recent enough that most people have not seen it yet.</p>
     <p>Two specific days broke outright. On <b>July 9</b>, Okta provisioning failed for ~57 people in three concentrated hourly windows &mdash; worst at 22:00, where only 2 of 22 trials got an account &mdash; while SAP ran normally. Marketing has since confirmed the Acoustic email template was changed <em>that same day</em>, which would explain it: no click, no Okta account. On <b>July 15&ndash;16</b>, the reverse pattern &mdash; Okta flawless, SAP order creation collapsed to under 4%, leaving ~200 trials with no order that appear never to have been backfilled.</p>
     <p>Within the EOI export itself, the stuck trials don't recover on their own: <b class="mono">752 of 768</b> are still on a trial subscription type today and <b class="mono">647</b> have run past their end date without converting.</p>
     <p><b>Separately &mdash; and this is the part most likely to be misread &mdash; volume and conversion are two different problems.</b> Trials are down 45% since January, but SAP lead records are down 46% over the same period. Those moving together means the decline starts <em>above</em> the sign-up form: it is a demand problem, driven by paid-search volume falling ~57% and one agency campaign dropping 98%. The engineering faults below are real and cost real orders, but they are not what halved the volume, and fixing them will not bring it back. Section 08 separates the two.</p>
@@ -280,7 +301,31 @@
   </div>
 </section>
 
-<section>
+<div class="toc">
+  <div class="toc-head">Contents</div>
+  <ol>
+    <li><a href="#s01" class="hot"><span class="n">01</span><span class="t">Executive summary</span><span class="d">The findings in one page</span></a></li>
+    <li><a href="#s02"><span class="n">02</span><span class="t">The end-to-end flow</span><span class="d">Nine stages; why stage 6 is a gate and 3–4 are blind</span></a></li>
+    <li><a href="#s03" class="hot"><span class="n">03</span><span class="t">What April actually was</span><span class="d">The verification rollout — and the question it closes</span></a></li>
+    <li><a href="#s04"><span class="n">04</span><span class="t">Every drop-off point</span><span class="d">Where trials are lost, measured against all trials</span></a></li>
+    <li><a href="#s05" class="hot"><span class="n">05</span><span class="t">Incident days</span><span class="d">The worst days and what broke on each</span></a></li>
+    <li><a href="#s06"><span class="n">06</span><span class="t">Timeline of key events</span><span class="d">Everything known, in order, with evidence tier</span></a></li>
+    <li><a href="#s07"><span class="n">07</span><span class="t">Inside the EOI reconciliation export</span><span class="d">The 771 stuck trials, broken down</span></a></li>
+    <li><a href="#s08"><span class="n">08</span><span class="t">Volume in context</span><span class="d">Trials as 93.6% of all new subscriptions</span></a></li>
+    <li><a href="#s09"><span class="n">09</span><span class="t">Where the volume went</span><span class="d">Demand vs. conversion — the two-problem split</span></a></li>
+    <li><a href="#s10"><span class="n">10</span><span class="t">The welcome email</span><span class="d">Acoustic data; the duplicate-send window measured</span></a></li>
+    <li><a href="#s11"><span class="n">11</span><span class="t">The authentication errors</span><span class="d">12,000+ failures on sign-in and sign-up</span></a></li>
+    <li><a href="#s12"><span class="n">12</span><span class="t">Data source coverage</span><span class="d">What's wired, what's blind, and why</span></a></li>
+    <li><a href="#s13" class="hot"><span class="n">13</span><span class="t">Issue register</span><span class="d">Every tracked issue, plus claims this report reversed</span></a></li>
+    <li><a href="#s14"><span class="n">14</span><span class="t">Recommendations</span><span class="d">Now / Next / Later</span></a></li>
+    <li><a href="#s15"><span class="n">15</span><span class="t">Methodology &amp; caveats</span><span class="d">Sources, exclusions, and known limits</span></a></li>
+  </ol>
+  <div class="toc-foot"><b>If you read three things:</b> the active SAP outage in &sect;01, &sect;03 on what April actually was, and the reversals at the end of the issue register.</div>
+</div>
+
+
+
+<section id="s02">
   <div class="section-head"><span class="section-num">02</span><h2 class="section-title">The end-to-end flow</h2></div>
   <p class="lede">Nine stages from marketing click to active trial, per the process map agreed by the team. Each stage is marked with whether it can be measured today &mdash; and two of them cannot be measured at all.</p>
 
@@ -323,8 +368,51 @@
     <b>Open question carried over from the process map: how long is a trial?</b> The base configuration says <b>7 days</b>; marketing copy says <b>30 days</b>. The live value comes from a deployment setting that is not in source control, so it cannot be resolved by reading the code &mdash; someone has to check the running production configuration. Until it is settled, every expiry-based figure in this report inherits the ambiguity.
   </div>
 </section>
-<section>
-  <div class="section-head"><span class="section-num">03</span><h2 class="section-title">Every drop-off point</h2></div>
+<section id="s03">
+  <div class="section-head"><span class="section-num">03</span><h2 class="section-title">What April actually was</h2></div>
+  <p class="lede">A dedicated daily funnel analysis of self-registered users &mdash; a cleaner instrument than anything else in this report &mdash; identifies the April change and closes the question this report has carried since the first draft.</p>
+
+  <div class="callout finding">
+    <b>April was the SIGNUP_FLOW_CHANGE verification rollout.</b> A mandatory email-verification step went from a <b>~7&ndash;9% pilot</b> in Jan&ndash;Mar to <b>72.5% of traffic in April</b> and <b>100% from May</b>. Verification-code volume jumped from ~0.5k/month to ~5&ndash;6k/month. This was a deliberate product change, not a fault &mdash; but it added a step, and the funnel lost people at it.
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Ratio</th><th class="num">Jan&ndash;Mar</th><th class="num">May&ndash;Jul</th><th class="num">After 25 Aug</th></tr></thead>
+      <tbody>
+        <tr><td>Verified / Gave email</td><td class="num">~43%<sup>*</sup></td><td class="num">77&ndash;79%</td><td class="num">75%</td></tr>
+        <tr><td><b>Account / Gave email</b></td><td class="num">&mdash;<sup>*</sup></td><td class="num" style="color:var(--critical)"><b>56&ndash;58%</b></td><td class="num">48%</td></tr>
+        <tr><td><b>Completed profile / Account</b></td><td class="num">74&ndash;76%</td><td class="num" style="color:var(--critical)"><b>57&ndash;58%</b></td><td class="num" style="color:var(--good)"><b>84&ndash;89%</b></td></tr>
+        <tr><td><b>SAP trial / Created trial</b></td><td class="num">~70%</td><td class="num" style="color:var(--critical)"><b>51&ndash;53%</b></td><td class="num">56&ndash;81%</td></tr>
+        <tr><td>Sent-to-SAP / Created trial</td><td class="num">96.7%</td><td class="num">97.1%</td><td class="num">98.2%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:13px;color:var(--ink-muted);margin-top:-8px"><sup>*</sup> Jan&ndash;Mar &ldquo;gave email&rdquo; counts reflect the small pilot only, not full traffic, so ratios against that denominator are not meaningful for the baseline period. This is why some published Q1 ratios exceed 100%.</p>
+
+  <div class="callout finding">
+    <b>The new leak: roughly 37% of people who enter an email never reach an account.</b> Account-per-email ran ~76% in April and settled at <b>56&ndash;58% from May onward</b>. That is the single biggest loss in the funnel and it did not exist before the rollout. It is also where the <b>12,000+ authentication failures</b> in &sect;11 would land &mdash; between entering an email and having a working account. The two findings are probably the same phenomenon seen from different sides.
+  </div>
+
+  <div class="callout">
+    <b>Why a verification step would depress SAP orders.</b> The SAP submit is <b>gated on first profile save</b>. Adding friction before the profile therefore propagates all the way to order creation, which is exactly the observed pattern: profile completion fell, and SAP trial conversion fell with it. The chain is <em>more friction &rarr; fewer completed profiles &rarr; fewer SAP orders</em> &mdash; not a broken integration.
+  </div>
+
+  <div class="callout" style="border-left-color:var(--good)">
+    <b>The 18 and 25 August deploys fixed the profile step.</b> Completed-profile-per-account moved ~57% (May&ndash;Jul) &rarr; ~73% (mid-Aug) &rarr; <b>84&ndash;89% after 25 Aug</b> (25 Aug: 77/87 &middot; 26 Aug: 165/196 &middot; 27 Aug: 100/116). That is <b>better than the pre-April baseline</b> of ~75%. Accepted-terms and login rates are near ceiling in the same window. This is the report's clearest good news &mdash; and it means the remaining SAP shortfall is now a SAP-leg problem, not a profile problem.
+  </div>
+
+  <div class="callout finding">
+    <b>The SAP leg has its own chronic fault, independent of all of the above.</b> Structurally, <b>20&ndash;35% of self-registration trials are marked &ldquo;sent to SAP&rdquo; but never receive a SAPOrderID</b> &mdash; a chronic ~32% gap, worsening to ~41&ndash;45% since April. The root cause is on record: <b>the SAP submit is a client-side fire-and-forget call with no retry</b>. Nothing detects or replays a failed submit, which is why these trials sit stuck indefinitely rather than self-healing, and why the 15&ndash;16 July and 27 August outages produced permanent orphans rather than delayed orders.
+  </div>
+
+  <div class="callout">
+    <b>Independent corroboration of the July outage.</b> This dataset shows 15 July at 2 SAP orders from 107 sent, and 16 July at 3 from 98 &mdash; matching the figures measured separately in &sect;05 almost exactly, from a different query against a different population definition. Two independent analyses agreeing to within one record is strong evidence both are correct.
+  </div>
+</section>
+
+<section id="s04">
+  <div class="section-head"><span class="section-num">04</span><h2 class="section-title">Every drop-off point</h2></div>
   <p class="lede">Each stage measured independently against all <b>29,285</b> external trials created Jan 1 &ndash; Aug 23, 2026. Measured as independent conditions, not a strict sequence &mdash; a trial can clear a later stage while failing an earlier one, and many do.</p>
 
   <div class="table-wrap">
@@ -400,8 +488,8 @@
   </div>
 </section>
 
-<section>
-  <div class="section-head"><span class="section-num">04</span><h2 class="section-title">Incident days</h2></div>
+<section id="s05">
+  <div class="section-head"><span class="section-num">05</span><h2 class="section-title">Incident days</h2></div>
   <p class="lede">Scanning every day in 2026 with at least 40 trials, two dates stand out as genuine breaks rather than noise &mdash; including the one flagged for a closer look.</p>
 
   <div class="chart-card">
@@ -443,8 +531,8 @@
   <p class="lede">Okta dips in the 50&ndash;65% band recur throughout the year (Jan 16, Feb 23, Mar 27, Apr 16, May 22, Jul 9, Jul 17, Aug 19, Aug 24). That recurrence pattern suggests a systemic provisioning weakness rather than a series of unrelated one-offs.</p>
 </section>
 
-<section>
-  <div class="section-head"><span class="section-num">05</span><h2 class="section-title">Timeline of key events</h2></div>
+<section id="s06">
+  <div class="section-head"><span class="section-num">06</span><h2 class="section-title">Timeline of key events</h2></div>
   <p class="lede">Everything currently known about when things changed and when they broke, in order. Each entry is tagged with how it is known &mdash; measured from data, confirmed by someone with access, or reported in discussion.</p>
 
   <div class="tl">
@@ -520,8 +608,8 @@
   </div>
 </section>
 
-<section>
-  <div class="section-head"><span class="section-num">06</span><h2 class="section-title">Inside the EOI reconciliation export</h2></div>
+<section id="s07">
+  <div class="section-head"><span class="section-num">07</span><h2 class="section-title">Inside the EOI reconciliation export</h2></div>
   <p class="lede">771 records, Jul 27 &ndash; Aug 18, 2026 (<span class="mono">stuck-sms-no-sap-order_EOI_Match.xlsx</span>). 17 are internal <span class="mono">@jjkeller.com</span> accounts on non-trial material and are excluded from the percentages below.</p>
 
   <div class="tiles">
@@ -607,8 +695,8 @@
   </div>
 </section>
 
-<section>
-  <div class="section-head"><span class="section-num">07</span><h2 class="section-title">Volume in context</h2></div>
+<section id="s08">
+  <div class="section-head"><span class="section-num">08</span><h2 class="section-title">Volume in context</h2></div>
   <p class="lede">How this window sits inside the full year &mdash; queried directly from <span class="mono">Auth.Subscription</span> in production.</p>
   <div class="tiles">
     <div class="tile"><div class="v">38,278</div><div class="l">new subscriptions, Jan 1 &ndash; Aug 27, 2026</div></div>
@@ -653,8 +741,8 @@
   </div>
 </section>
 
-<section>
-  <div class="section-head"><span class="section-num">08</span><h2 class="section-title">Where the volume went</h2></div>
+<section id="s09">
+  <div class="section-head"><span class="section-num">09</span><h2 class="section-title">Where the volume went</h2></div>
   <p class="lede">23,571 SAP lead records, Jan 1 &ndash; Aug 26, 2026, with campaign attribution. This is the only dataset here that reaches above the sign-up form &mdash; and it separates two problems that have been getting conflated.</p>
 
   <div class="chart-card">
@@ -708,8 +796,8 @@
   </div>
 </section>
 
-<section>
-  <div class="section-head"><span class="section-num">09</span><h2 class="section-title">The welcome email</h2></div>
+<section id="s10">
+  <div class="section-head"><span class="section-num">10</span><h2 class="section-title">The welcome email</h2></div>
   <p class="lede">58,543 per-recipient Acoustic events, Oct 2025 &ndash; Aug 2026. <b>Read the scope limit first:</b> this export contains only the <em>welcome</em> email (stage 8, sent after the SAP order). The <em>verification</em> email &mdash; stage 3, the one everyone wants to understand &mdash; is not in it. Several things below therefore correct the record without being able to settle the question they bear on.</p>
 
   <div class="callout finding">
@@ -761,8 +849,8 @@
   </div>
 </section>
 
-<section>
-  <div class="section-head"><span class="section-num">10</span><h2 class="section-title">The authentication errors</h2></div>
+<section id="s11">
+  <div class="section-head"><span class="section-num">11</span><h2 class="section-title">The authentication errors</h2></div>
   <p class="lede">Correspondence dated Aug 26&ndash;27, 2026 introduces a dataset this report has not seen, and it may be the most important one yet.</p>
 
   <div class="callout finding">
@@ -778,8 +866,8 @@
   </div>
 </section>
 
-<section>
-  <div class="section-head"><span class="section-num">11</span><h2 class="section-title">Data source coverage</h2></div>
+<section id="s12">
+  <div class="section-head"><span class="section-num">12</span><h2 class="section-title">Data source coverage</h2></div>
   <p class="lede">What's wired into this report versus what the whiteboard walkthrough calls for.</p>
   <div class="table-wrap">
     <table>
@@ -810,15 +898,19 @@
   <p class="lede">Net effect: the profile-form abandonment question &mdash; do people reach the form and give up, or never arrive? &mdash; <b>cannot be answered from any currently available source.</b> Pendo Analytics is unlicensed, Elastic RUM records no page views, and Application Insights has not yet been checked.</p>
 </section>
 
-<section>
-  <div class="section-head"><span class="section-num">12</span><h2 class="section-title">Issue register</h2></div>
-  <p class="lede">All sixteen known issues in one place, with what broke, when it started, and whether it is closed &mdash; the format agreed in the Aug 27 process-mapping session. Maintained as a shared spreadsheet; this table is the snapshot.</p>
+<section id="s13">
+  <div class="section-head"><span class="section-num">13</span><h2 class="section-title">Issue register</h2></div>
+  <p class="lede">All twenty tracked issues in one place, with what broke, when it started, and whether it is closed &mdash; the format agreed in the Aug 27 process-mapping session. Maintained as a shared spreadsheet; this table is the snapshot.</p>
 
   <div class="table-wrap">
     <table>
       <thead><tr><th>ID</th><th>Issue</th><th>Bucket</th><th>Started</th><th>Status</th><th>Evidence</th></tr></thead>
       <tbody>
-        <tr><td class="mono">TF-06</td><td><b>SAP order rate step-change</b> &mdash; 73% &rarr; 56%, four months</td><td>SAP</td><td>April 2026</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Measured</td></tr>
+        <tr><td class="mono">TF-06</td><td>SAP order step-change &mdash; <b>explained: SIGNUP_FLOW_CHANGE verification rollout</b></td><td>SAP</td><td>April 2026</td><td><span class="status-pill live"><i class="dot"></i>Explained</span></td><td>Measured</td></tr>
+        <tr><td class="mono">TF-17</td><td><b>ACTIVE 27 Aug: 93 of 116 trials stuck</b> &mdash; sent to SAP, no order (20% vs 81% prior day)</td><td>SAP</td><td>27 Aug 2026</td><td><span class="status-pill missing"><i class="dot"></i>Active outage</span></td><td>Measured</td></tr>
+        <tr><td class="mono">TF-18</td><td><b>SAP submit is fire-and-forget with no retry</b> &mdash; failed submits never replay</td><td>SAP</td><td>Structural</td><td><span class="status-pill missing"><i class="dot"></i>Open &mdash; root cause</span></td><td>Reported</td></tr>
+        <tr><td class="mono">TF-19</td><td><b>~37% of email-enterers never reach an account</b> &mdash; new leak from the verification step</td><td>Signup</td><td>May 2026</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Measured</td></tr>
+        <tr><td class="mono">TF-20</td><td>Profile completion per account &mdash; <b>fixed by the 18 &amp; 25 Aug deploys</b>, 57% &rarr; 84&ndash;89%</td><td>Signup</td><td>Fixed 25 Aug</td><td><span class="status-pill live"><i class="dot"></i>Resolved</span></td><td>Measured</td></tr>
         <tr><td class="mono">TF-05</td><td><b>SAP outage</b> &mdash; ~200 trials, no order, never backfilled</td><td>SAP</td><td>Jul 15&ndash;16</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Measured</td></tr>
         <tr><td class="mono">TF-04</td><td><b>Okta provisioning failure</b> &mdash; ~57 users stranded</td><td>Okta</td><td>Jul 9</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Measured</td></tr>
         <tr><td class="mono">TF-07</td><td><b>Chronic Okta gap</b> &mdash; 14.2% of trials, all year</td><td>Okta</td><td>Pre-2026</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Measured</td></tr>
@@ -843,12 +935,12 @@
   </div>
 
   <div class="callout finding">
-    <b>Seven of the sixteen have no owner</b> &mdash; including TF-06, the largest single issue in this report, and TF-05, where ~200 orders were never created. The Aug 27 session assigned investigation work but not these.
+    <b>Eight of the twenty have no owner</b> &mdash; including TF-06, the largest single issue in this report, and TF-05, where ~200 orders were never created. The Aug 27 session assigned investigation work but not these.
   </div>
 </section>
 
-<section>
-  <div class="section-head"><span class="section-num">13</span><h2 class="section-title">Recommendations</h2></div>
+<section id="s14">
+  <div class="section-head"><span class="section-num">14</span><h2 class="section-title">Recommendations</h2></div>
   <p class="lede">Roughly in priority order &mdash; the first two are cheap and point straight at the biggest number here.</p>
   <div class="reco-list">
     <div class="reco">
@@ -904,9 +996,9 @@
   </div>
 </section>
 
-<section>
+<section id="s15">
   <div class="col">
-    <div class="section-head"><span class="section-num">14</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
+    <div class="section-head"><span class="section-num">15</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
     <p><b>Sources.</b> (0) <span class="mono">Leads And Orders - All Leads.xlsx</span> &mdash; 23,571 SAP lead records with campaign attribution, Jan 1 &ndash; Aug 26, 2026. (1) <span class="mono">stuck-sms-no-sap-order_EOI_Match.xlsx</span> &mdash; a SAP BI EOI reconciliation export covering Jul 27 &ndash; Aug 18, 2026; 771 data rows. (2) Read-only queries against the SMS production database, authenticated via Azure AD; no credentials stored or transmitted.</p>
     <p><b>The export is a filtered list, not the full population.</b> It contains SMS subscriptions flagged as having no SAP order. SMS-wide, 2,081 trial subscriptions were created in the same window, so the 771 records represent about 37% of trials &mdash; every percentage in Section 03 is a share of that stuck subset, not of all trials.</p>
     <p><b>External vs. internal.</b> Records with an <span class="mono">@jjkeller.com</span> email are treated as internal (17 of 771) and excluded from Section 03 percentages.</p>
