@@ -17,10 +17,10 @@ behind an access code.
 | SMS production database | Trial creation, Okta account provisioning, SAP order linkage, location address |
 | SAP BI EOI reconciliation export | Order match status for trials flagged as having no SAP order |
 
-Pendo Analytics is not licensed by JJK and is unavailable as a source. Acoustic and
-Google Analytics were not connected for this pass; the report marks those funnel
-stages as gaps rather than estimating them. Elastic APM RUM and Application Insights
-are instrumented in the SMS SPA and are the likely route to front-end engagement data.
+Pendo Analytics is not licensed by JJK and is unavailable as a source. Elastic APM RUM
+is deployed and reporting but records zero transactions, so it captures no page views
+(see the report). Acoustic and Google Analytics were not connected for this pass. All
+such stages are marked as gaps rather than estimated.
 
 ## Notes
 

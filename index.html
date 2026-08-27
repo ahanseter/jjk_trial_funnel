@@ -551,14 +551,24 @@
         <tr><td>SMS production DB</td><td>Trial creation, profile completion, live status</td><td><span class="status-pill live"><i class="dot"></i>Live</span></td><td>Read-only queries against the SMS production database via Azure AD</td></tr>
         <tr><td>SAP BI EOI export</td><td>Order match / creation</td><td><span class="status-pill live"><i class="dot"></i>Live</span></td><td>Manual <span class="mono">.xlsx</span> export today; used the Jul 27 &ndash; Aug 18 pull</td></tr>
         <tr><td>Pendo</td><td>Trial-start click, profile-form engagement</td><td><span class="status-pill missing"><i class="dot"></i>Not licensed</span></td><td>JJK does not license Pendo Analytics &mdash; this source is unavailable by subscription, not by configuration. Do not plan around it.</td></tr>
-        <tr><td>Elastic APM (RUM)</td><td>Profile-form page views and interactions</td><td><span class="status-pill partial"><i class="dot"></i>Wired, not yet queried</span></td><td>Already instrumented in the SMS SPA. The most likely substitute for what Pendo would have answered.</td></tr>
-        <tr><td>Application Insights</td><td>Front-end page views, client errors</td><td><span class="status-pill partial"><i class="dot"></i>Wired, not yet queried</span></td><td>Runs in parallel with Elastic APM; second option for the same questions.</td></tr>
+        <tr><td>Elastic APM (RUM)</td><td>Profile-form page views and interactions</td><td><span class="status-pill missing"><i class="dot"></i>Capturing no page views</span></td><td>Agent is live in prod but records <b>zero transactions</b> &mdash; see the finding below. Errors only.</td></tr>
+        <tr><td>Application Insights</td><td>Front-end page views, client errors</td><td><span class="status-pill partial"><i class="dot"></i>Wired, not yet queried</span></td><td>Runs in parallel with Elastic APM; the remaining candidate for front-end funnel data.</td></tr>
         <tr><td>Acoustic</td><td>Verification email sent / opened / clicked / bounced</td><td><span class="status-pill missing"><i class="dot"></i>Not connected</span></td><td>No API or export access from this session</td></tr>
         <tr><td>Okta</td><td>Account creation</td><td><span class="status-pill live"><i class="dot"></i>Live (via SMS DB)</span></td><td>Read from <span class="mono">JJK.User.OktaId</span> &mdash; proves an account exists, but not <em>when</em> it was created or whether a password reset followed. Okta's own API would add that timing.</td></tr>
         <tr><td>Google Analytics</td><td>Promo click, marketing attribution</td><td><span class="status-pill missing"><i class="dot"></i>Out of scope</span></td><td>Explicitly deferred for this pass</td></tr>
       </tbody>
     </table>
   </div>
+
+  <div class="callout finding">
+    <b>The front-end telemetry everyone assumes exists is not being collected.</b> Elastic APM's browser agent <em>is</em> live in production &mdash; <span class="mono">rum-js</span> v5.17.4, reporting from <span class="mono">www.jjkellerportal.com</span> within the last hour. But over 90 days the <span class="mono">SMS_Web_UI</span> service has recorded <b>0 transactions and 0 spans</b>, against 111,411 errors and 30.5M metric documents. No transactions means <b>no page views</b>, which means no front-end funnel can be built from it. Nonprod shows the same pattern (0 transactions, 12,688 errors), so this is not an environment-specific misconfiguration.
+  </div>
+
+  <div class="callout">
+    <b>A likely cause, offered as a lead rather than a conclusion.</b> <span class="mono">apm.init()</span> is called from the <span class="mono">AppModule</span> constructor rather than in <span class="mono">main.ts</span> before <span class="mono">bootstrapModule()</span>. Elastic's Angular integration expects initialisation before bootstrap; initialising later means the page-load transaction window has already closed and route-change instrumentation may never bind to the router. The error handler is registered separately and would keep working either way &mdash; which matches the errors-yes / transactions-no asymmetry exactly. This needs a developer to confirm; it was not verified beyond the data above.
+  </div>
+
+  <p class="lede">Net effect: the profile-form abandonment question &mdash; do people reach the form and give up, or never arrive? &mdash; <b>cannot be answered from any currently available source.</b> Pendo Analytics is unlicensed, Elastic RUM records no page views, and Application Insights has not yet been checked.</p>
 </section>
 
 <section>
@@ -602,8 +612,8 @@
     </div>
     <div class="reco">
       <div class="reco-num">08</div><div class="reco-badge"><span class="badge later">Later</span></div>
-      <div class="reco-body"><h3>Use Elastic APM RUM for the profile-form question &mdash; not Pendo</h3>
-      <p>JJK doesn't license Pendo Analytics, so that avenue is closed. Elastic APM's real-user monitoring is already instrumented in the SMS SPA and can answer the same question: do people reach the profile form and abandon on it, or never get there? Acoustic remains the only way to measure email verification, and is still unconnected.</p></div>
+      <div class="reco-body"><h3>Fix Elastic RUM transaction capture &mdash; it is the cheapest route to front-end visibility</h3>
+      <p>The browser agent is already deployed, licensed and reporting; it just isn't recording page views (&sect;07). If the <span class="mono">apm.init()</span> placement is the cause, this is a small change that unlocks the profile-form question, the signup funnel, and front-end performance data at once. Pendo can't fill this gap &mdash; JJK doesn't license Analytics &mdash; and Acoustic remains the only route to email-verification data.</p></div>
     </div>
   </div>
 </section>
