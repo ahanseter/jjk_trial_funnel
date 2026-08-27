@@ -550,7 +550,9 @@
       <tbody>
         <tr><td>SMS production DB</td><td>Trial creation, profile completion, live status</td><td><span class="status-pill live"><i class="dot"></i>Live</span></td><td>Read-only queries against the SMS production database via Azure AD</td></tr>
         <tr><td>SAP BI EOI export</td><td>Order match / creation</td><td><span class="status-pill live"><i class="dot"></i>Live</span></td><td>Manual <span class="mono">.xlsx</span> export today; used the Jul 27 &ndash; Aug 18 pull</td></tr>
-        <tr><td>Pendo</td><td>Trial-start click, profile-form engagement</td><td><span class="status-pill partial"><i class="dot"></i>Unreachable</span></td><td>Connector timed out during this session &mdash; retry, not a structural gap</td></tr>
+        <tr><td>Pendo</td><td>Trial-start click, profile-form engagement</td><td><span class="status-pill missing"><i class="dot"></i>Not licensed</span></td><td>JJK does not license Pendo Analytics &mdash; this source is unavailable by subscription, not by configuration. Do not plan around it.</td></tr>
+        <tr><td>Elastic APM (RUM)</td><td>Profile-form page views and interactions</td><td><span class="status-pill partial"><i class="dot"></i>Wired, not yet queried</span></td><td>Already instrumented in the SMS SPA. The most likely substitute for what Pendo would have answered.</td></tr>
+        <tr><td>Application Insights</td><td>Front-end page views, client errors</td><td><span class="status-pill partial"><i class="dot"></i>Wired, not yet queried</span></td><td>Runs in parallel with Elastic APM; second option for the same questions.</td></tr>
         <tr><td>Acoustic</td><td>Verification email sent / opened / clicked / bounced</td><td><span class="status-pill missing"><i class="dot"></i>Not connected</span></td><td>No API or export access from this session</td></tr>
         <tr><td>Okta</td><td>Account creation</td><td><span class="status-pill live"><i class="dot"></i>Live (via SMS DB)</span></td><td>Read from <span class="mono">JJK.User.OktaId</span> &mdash; proves an account exists, but not <em>when</em> it was created or whether a password reset followed. Okta's own API would add that timing.</td></tr>
         <tr><td>Google Analytics</td><td>Promo click, marketing attribution</td><td><span class="status-pill missing"><i class="dot"></i>Out of scope</span></td><td>Explicitly deferred for this pass</td></tr>
@@ -600,8 +602,8 @@
     </div>
     <div class="reco">
       <div class="reco-num">08</div><div class="reco-badge"><span class="badge later">Later</span></div>
-      <div class="reco-body"><h3>Connect Acoustic, and retry Pendo</h3>
-      <p>Email verification is the last stage with no data behind it at all. Pendo was merely unreachable this session and would show whether people abandon <em>on</em> the profile form or never reach it.</p></div>
+      <div class="reco-body"><h3>Use Elastic APM RUM for the profile-form question &mdash; not Pendo</h3>
+      <p>JJK doesn't license Pendo Analytics, so that avenue is closed. Elastic APM's real-user monitoring is already instrumented in the SMS SPA and can answer the same question: do people reach the profile form and abandon on it, or never get there? Acoustic remains the only way to measure email verification, and is still unconnected.</p></div>
     </div>
   </div>
 </section>
@@ -615,7 +617,7 @@
     <p><b>Match terminology</b> reflects the export's own <span class="mono">Match Status</span> column as produced by the existing reconciliation job; this report did not re-derive match logic independently.</p>
     <p><b>Stage definitions.</b> Okta account = <span class="mono">JJK.User.OktaId</span> populated. SAP order = <span class="mono">Auth.SubscriptionDetails.SAPOrderID</span> populated. Location address = a non-deleted <span class="mono">CompanyData.Location</span> row with both <span class="mono">Address1</span> and <span class="mono">City</span> non-empty. Stages are evaluated <b>independently</b>, not as a strict sequence &mdash; trials routinely clear one stage while failing an earlier one.</p>
     <p><b>Provisioning lag guard.</b> Section 03 and the sample CSV exclude trials created after Aug 23 so that asynchronous Okta and SAP provisioning still in flight is not counted as permanent failure. An earlier cut without this guard showed a spike of &ldquo;no Okta account&rdquo; records dated the same day the query ran &mdash; provisioning lag, not failure.</p>
-    <p><b>Not included:</b> Pendo (connector unreachable this session), Acoustic, and Google Analytics (no connected data source for this pass). Those stages are marked as gaps rather than estimated. Okta was originally expected to be a gap but proved readable from the SMS database.</p>
+    <p><b>Not included:</b> Pendo (JJK does not license Pendo Analytics &mdash; unavailable by subscription), Acoustic, and Google Analytics (no connected data source for this pass). Those stages are marked as gaps rather than estimated. Okta was originally expected to be a gap but proved readable from the SMS database via the user record's Okta ID. Elastic APM RUM and Application Insights are instrumented in the SMS SPA but were not queried for this pass; they are the most likely route to the front-end engagement data Pendo would have supplied.</p>
     <p><b>&ldquo;Companies on a paid subscription&rdquo;</b> counts non-deleted companies whose current subscription row points at a non-trial subscription type. SMS keeps a single current-subscription pointer per company rather than a history, so all such counts are status snapshots, not point-in-time series.</p>
   </div>
 </section>
