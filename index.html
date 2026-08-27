@@ -272,7 +272,7 @@
     <div class="section-head"><span class="section-num">01</span><h2 class="section-title">Executive summary</h2></div>
     <p>Every SMS subscription &mdash; trial or paid &mdash; is meant to end up as a matched order in SAP. That's how JJK counts it, bills it, and routes it to a rep. The reconciliation export SMS runs against SAP's EOI extract exists to catch the ones that don't make it. In the latest three-week window, <b class="mono">771</b> trials landed on that list out of <b class="mono">2,081</b> created &mdash; roughly <b>one in three</b>.</p>
     <p>Looking across all <b class="mono">29,285</b> external trials created this year, three drop-off points are unambiguous. <b class="mono">2.9%</b> never get a user record at all. <b class="mono">14.2%</b> get a user record but <b>no Okta account</b> &mdash; meaning they cannot sign in to the product they just signed up for. And <b class="mono">32.8%</b> never get a SAP order attached. (A fourth measure, profile completion, is in dispute &mdash; see Section 03.)</p>
-    <p><b>The single largest finding is a step-change in April.</b> SAP order creation ran at 70&ndash;74% through Q1, then fell to 55&ndash;59% in April and stayed there for four months. Okta provisioning, by contrast, has been flat all year. Something changed in April that is still costing roughly <b>15 points of order conversion on every trial</b>. A candidate has since emerged &mdash; the April promo-code release triggered duplicate verification emails to ~10,000 recipients &mdash; but it has not been shown to account for the whole drop.</p>
+    <p><b>The single largest finding is a step-change in April.</b> SAP order creation ran at 70&ndash;74% through Q1, then fell to 55&ndash;59% in April and stayed there for four months. Okta provisioning, by contrast, has been flat all year. Something changed in April that is still costing roughly <b>15 points of order conversion on every trial</b>. <b>Three independent datasets now show that April break</b> &mdash; SAP order rate, the leads/trials ratio, and welcome-email click-through &mdash; so it is firmly real. The leading candidate cause, duplicate emails, was tested against the Acoustic data and <b>ruled out</b>: the duplicates ran Jun 17 &ndash; Jul 1, ten weeks after the drop. The cause is currently unknown.</p>
     <p>Two specific days broke outright. On <b>July 9</b>, Okta provisioning failed for ~57 people in three concentrated hourly windows &mdash; worst at 22:00, where only 2 of 22 trials got an account &mdash; while SAP ran normally. Marketing has since confirmed the Acoustic email template was changed <em>that same day</em>, which would explain it: no click, no Okta account. On <b>July 15&ndash;16</b>, the reverse pattern &mdash; Okta flawless, SAP order creation collapsed to under 4%, leaving ~200 trials with no order that appear never to have been backfilled.</p>
     <p>Within the EOI export itself, the stuck trials don't recover on their own: <b class="mono">752 of 768</b> are still on a trial subscription type today and <b class="mono">647</b> have run past their end date without converting.</p>
     <p><b>Separately &mdash; and this is the part most likely to be misread &mdash; volume and conversion are two different problems.</b> Trials are down 45% since January, but SAP lead records are down 46% over the same period. Those moving together means the decline starts <em>above</em> the sign-up form: it is a demand problem, driven by paid-search volume falling ~57% and one agency campaign dropping 98%. The engineering faults below are real and cost real orders, but they are not what halved the volume, and fixing them will not bring it back. Section 08 separates the two.</p>
@@ -396,7 +396,7 @@
   </div>
 
   <div class="callout finding">
-    <b>A candidate cause emerged on Aug 27.</b> The promo-code feature shipped in <b>April</b> &mdash; the same month as the step-change &mdash; and its Acoustic send wrote to a column that did not exist. Every send therefore returned an error, and the retry fired five minutes later, producing <b>duplicate verification emails to roughly 10,000 recipients</b>. Duplicate sends depress click-through directly (people click one link, not three) and plausibly depress completion too. <b>This is a strong lead, not a proven cause</b> &mdash; the exact start and end dates have not been pinned down, so no one has yet shown it accounts for the full 15-point drop. Confirming those dates is the fastest way to test it.
+    <b>The leading candidate has been tested and ruled out.</b> The Aug 27 session proposed that the April promo-code release caused duplicate emails to ~10,000 recipients, depressing engagement and completion. Measured against the Acoustic export (Section 09), the duplicates affected <b>990 recipients, not 10,000</b>, and ran <b>June 17 &ndash; July 1 &mdash; ten weeks after this step-change began</b>, stopping while the depressed rate continued. Duplicates cannot be the cause. What <em>does</em> hold is the April boundary itself: three unrelated datasets show it. The cause remains unidentified, and the search should reopen rather than close.
   </div>
 </section>
 
@@ -709,7 +709,77 @@
 </section>
 
 <section>
-  <div class="section-head"><span class="section-num">09</span><h2 class="section-title">Data source coverage</h2></div>
+  <div class="section-head"><span class="section-num">09</span><h2 class="section-title">The welcome email</h2></div>
+  <p class="lede">58,543 per-recipient Acoustic events, Oct 2025 &ndash; Aug 2026. <b>Read the scope limit first:</b> this export contains only the <em>welcome</em> email (stage 8, sent after the SAP order). The <em>verification</em> email &mdash; stage 3, the one everyone wants to understand &mdash; is not in it. Several things below therefore correct the record without being able to settle the question they bear on.</p>
+
+  <div class="callout finding">
+    <b>The duplicate-send incident ran June 17 &ndash; July 1, 2026, and affected ~990 recipients &mdash; not ~10,000, and not April.</b> The Aug 27 session recorded roughly 10,000 recipients getting duplicates, tied to the April promo-code release. In this dataset the true figure is <b>990 recipients and 993 extra copies</b>, of which <b>974 fall inside a contiguous 15-day window from June 17 to July 1</b>. Outside that window duplicates are essentially nil &mdash; 19 across eleven months. The meeting's figure came from an unverified analysis and the person presenting it said so at the time; this is the measured version.
+  </div>
+
+  <div class="callout finding">
+    <b>Which means duplicates cannot explain the April step-change.</b> They began <b>ten weeks after</b> SAP order creation dropped, and stopped on July 1 while the depressed rate continued through July. The leading candidate cause for the largest number in this report does not survive contact with the data. <b>TF-06 is unexplained again</b> &mdash; and the April investigation needs restarting rather than closing.
+  </div>
+
+  <div class="callout">
+    <b>Caveat, and it matters.</b> The duplicate mechanism described in the session concerned the <em>promo-code / verification</em> send, which is not in this export. So a separate duplicate problem may well have existed on that mailing at the scale and timing described. What can be said is narrower and worth saying precisely: <b>on the welcome email, duplicates were a June&ndash;July event affecting ~990 people.</b> Whoever pulled the original 10,000 figure should confirm which mailing it referred to.
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Welcome-email engagement, monthly</div>
+    <div class="chart-sub">Unique openers and clickers as a share of unique recipients &mdash; note April</div>
+    <div class="stack-chart">
+      <div class="stack-row"><div class="stack-label"><span>Jan 2026</span><b>54% open &middot; 17% click</b></div><div class="stack-track" style="background:transparent;gap:3px"><div class="stack-seg" style="width:54%;background:var(--s-okta);border-radius:5px"></div><div class="stack-seg" style="width:17%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>Feb</span><b>51% &middot; 16%</b></div><div class="stack-track" style="background:transparent;gap:3px"><div class="stack-seg" style="width:51%;background:var(--s-okta);border-radius:5px"></div><div class="stack-seg" style="width:16%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>Mar</span><b>51% &middot; 15%</b></div><div class="stack-track" style="background:transparent;gap:3px"><div class="stack-seg" style="width:51%;background:var(--s-okta);border-radius:5px"></div><div class="stack-seg" style="width:15%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>Apr</span><b>50% &middot; 12%</b></div><div class="stack-track" style="background:transparent;gap:3px"><div class="stack-seg" style="width:50%;background:var(--s-okta);border-radius:5px"></div><div class="stack-seg" style="width:12%;background:var(--critical);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>May</span><b>53% &middot; 13%</b></div><div class="stack-track" style="background:transparent;gap:3px"><div class="stack-seg" style="width:53%;background:var(--s-okta);border-radius:5px"></div><div class="stack-seg" style="width:13%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>Jun</span><b>54% &middot; 14%</b></div><div class="stack-track" style="background:transparent;gap:3px"><div class="stack-seg" style="width:54%;background:var(--s-okta);border-radius:5px"></div><div class="stack-seg" style="width:14%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>Jul</span><b>52% &middot; 13%</b></div><div class="stack-track" style="background:transparent;gap:3px"><div class="stack-seg" style="width:52%;background:var(--s-okta);border-radius:5px"></div><div class="stack-seg" style="width:13%;background:var(--s-sap);border-radius:5px"></div></div></div>
+      <div class="stack-row"><div class="stack-label"><span>Aug <span style="color:var(--ink-muted)">(to 26th)</span></span><b>41% &middot; 11%</b></div><div class="stack-track" style="background:transparent;gap:3px"><div class="stack-seg" style="width:41%;background:var(--critical);border-radius:5px"></div><div class="stack-seg" style="width:11%;background:var(--critical);border-radius:5px"></div></div></div>
+    </div>
+    <div class="chart-legend"><span><i class="swatch" style="background:var(--s-okta)"></i>Opened</span><span><i class="swatch" style="background:var(--s-sap)"></i>Clicked</span><span><i class="swatch" style="background:var(--critical)"></i>Notably low</span></div>
+  </div>
+
+  <div class="callout">
+    <b>A third independent April signal.</b> Click-through ran <b>15&ndash;17% through Q1</b> and fell to <b>12&ndash;14% from April</b> &mdash; the same month, the same direction, as the SAP order rate and the leads/trials ratio. Three unrelated datasets now show an April break. That makes the step-change about as well-evidenced as anything in this report, even though its cause is once again unknown. August is worth separate attention: open rate fell to <b>41%</b> from a stable 50&ndash;54%, its lowest in eleven months.
+  </div>
+
+  <div class="callout">
+    <b>On July 9: no click-rate break, but the click <em>mix</em> shifted.</b> Daily click-through either side of July 9 is flat (12% on the 8th, 12% on the 9th, 16% on the 10th) &mdash; no discontinuity. But the distribution moved sharply: <span class="mono">LogIn_Button_Top</span> went from <b>31.8%</b> of clicks before July 9 to <b>46.5%</b> after, with most other targets losing share. Something about the layout did change. Since this is the welcome email and the confirmed July 9 edit was to a different mailing, this neither confirms nor refutes the TF-03&rarr;TF-04 chain &mdash; but it does show a template change landing in this period.
+  </div>
+
+  <div class="callout finding">
+    <b>The verification email does not come from Acoustic at all &mdash; and has nothing to click.</b> A sample of the live message shows it is sent by <span class="mono">noreply@login.jjkeller.com</span>, i.e. <b>generated by Okta</b>, and it delivers a <b>six-digit code the user types in</b>. There is no verification link. That resolves two things at once. It explains structurally why stages 3&ndash;4 emit no click telemetry &mdash; <b>there is no click to record</b> &mdash; and it means <b>no Acoustic export will ever contain this mailing</b>, however many are pulled. The route to this data is <b>Okta system logs</b>, not the email platform.
+  </div>
+
+  <div class="callout">
+    <b>Which undermines my own earlier hypothesis, and it should be retired.</b> Sections 04 and 05 proposed that the July 9 Acoustic template change reduced verification clicks and therefore Okta account creation. That chain cannot work: the verification email is not an Acoustic mailing and contains no link. <b>The July 9 Okta failure and the July 9 Acoustic template change appear to be two separate events on the same day.</b> The Okta drop is measured and real; its cause is once again open.
+  </div>
+
+  <div class="callout">
+    <b>A smaller discrepancy worth fixing.</b> The email tells the recipient the code <b>&ldquo;will expire in 30 minutes&rdquo;</b>, while the process map records the temporary verification record as having a <b>1-hour expiry</b>. Not necessarily a fault &mdash; a code may legitimately expire before its record is cleaned up &mdash; but the two numbers should be reconciled, since one of them is what the customer is told.
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><span class="section-num">10</span><h2 class="section-title">The authentication errors</h2></div>
+  <p class="lede">Correspondence dated Aug 26&ndash;27, 2026 introduces a dataset this report has not seen, and it may be the most important one yet.</p>
+
+  <div class="callout finding">
+    <b>Over 12,000 failed authentication requests in 30 days</b>, on the SMS API's sign-in, sign-up and password endpoints. Product Management circulated the workbook internally on Aug 26 and stated plainly that although the data covers only the last month, <b>&ldquo;this has been an ongoing issue since at least April.&rdquo;</b> The list has been passed to Okta and a technical review has been requested.
+  </div>
+
+  <div class="callout finding">
+    <b>This is now the strongest candidate for the April step-change &mdash; and it fits where duplicates did not.</b> The mechanism is direct: sign-up and password failures block stage 5, a blocked stage 5 means the mandatory profile at stage 6 is never completed, and stage 6 is the <em>trigger</em> for the SAP trial order at stage 7. Auth errors therefore suppress SAP order creation by design, exactly as observed. It matches on timing (April), on duration (still ongoing), and on mechanism (no order without a completed profile). It also fits the one thing the duplicate theory never explained: why Okta <em>provisioning</em> stayed flat at 81&ndash;85% all year while orders fell. Provisioning measures accounts that were created; these are the attempts that failed before an account existed.
+  </div>
+
+  <div class="callout">
+    <b>Stated as a hypothesis, because this report has not seen the workbook.</b> Everything above rests on the description in the correspondence, not on the error data itself. Getting that workbook &mdash; and joining its 12,000 failures to trial records by date and email &mdash; is the single highest-value next step available. If the failure curve steps up in April and tracks the SAP order rate, TF-06 is solved.
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><span class="section-num">11</span><h2 class="section-title">Data source coverage</h2></div>
   <p class="lede">What's wired into this report versus what the whiteboard walkthrough calls for.</p>
   <div class="table-wrap">
     <table>
@@ -721,7 +791,8 @@
         <tr><td>Pendo</td><td>Trial-start click, profile-form engagement</td><td><span class="status-pill missing"><i class="dot"></i>No SMS data</span></td><td>API and aggregation both work. But across three years and all event types, only the Encompass app reports data &mdash; SMS has <b>119 pages tagged and zero events, ever</b>. Analytics is licensed for Encompass, not SMS.</td></tr>
         <tr><td>Elastic APM (RUM)</td><td>Profile-form page views and interactions</td><td><span class="status-pill missing"><i class="dot"></i>Capturing no page views</span></td><td>Agent is live in prod but records <b>zero transactions</b> &mdash; see the finding below. Errors only.</td></tr>
         <tr><td>Application Insights</td><td>Front-end page views, client errors</td><td><span class="status-pill partial"><i class="dot"></i>Wired, not yet queried</span></td><td>Runs in parallel with Elastic APM; the remaining candidate for front-end funnel data.</td></tr>
-        <tr><td>Acoustic</td><td>Verification email sent / opened / clicked / bounced</td><td><span class="status-pill missing"><i class="dot"></i>Not connected</span></td><td>No API or export access from this session</td></tr>
+        <tr><td>Acoustic &mdash; welcome email</td><td>Welcome email sent / opened / clicked</td><td><span class="status-pill live"><i class="dot"></i>Live</span></td><td>58,543 per-recipient events, Oct 2025 &ndash; Aug 2026.</td></tr>
+        <tr><td>Acoustic &mdash; verification email</td><td>Verification email sent / opened / clicked</td><td><span class="status-pill missing"><i class="dot"></i>Not supplied</span></td><td>Not in the export received. This is the mailing that matters most for stages 3&ndash;4.</td></tr>
         <tr><td>Okta</td><td>Account creation</td><td><span class="status-pill live"><i class="dot"></i>Live (via SMS DB)</span></td><td>Read from <span class="mono">JJK.User.OktaId</span> &mdash; proves an account exists, but not <em>when</em> it was created or whether a password reset followed. Okta's own API would add that timing.</td></tr>
         <tr><td>Google Analytics</td><td>Promo click, marketing attribution</td><td><span class="status-pill missing"><i class="dot"></i>Out of scope</span></td><td>Explicitly deferred for this pass</td></tr>
       </tbody>
@@ -740,8 +811,8 @@
 </section>
 
 <section>
-  <div class="section-head"><span class="section-num">10</span><h2 class="section-title">Issue register</h2></div>
-  <p class="lede">All fifteen known issues in one place, with what broke, when it started, and whether it is closed &mdash; the format agreed in the Aug 27 process-mapping session. Maintained as a shared spreadsheet; this table is the snapshot.</p>
+  <div class="section-head"><span class="section-num">12</span><h2 class="section-title">Issue register</h2></div>
+  <p class="lede">All sixteen known issues in one place, with what broke, when it started, and whether it is closed &mdash; the format agreed in the Aug 27 process-mapping session. Maintained as a shared spreadsheet; this table is the snapshot.</p>
 
   <div class="table-wrap">
     <table>
@@ -753,14 +824,15 @@
         <tr><td class="mono">TF-07</td><td><b>Chronic Okta gap</b> &mdash; 14.2% of trials, all year</td><td>Okta</td><td>Pre-2026</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Measured</td></tr>
         <tr><td class="mono">TF-10</td><td><b>Elastic RUM records no page views</b></td><td>Observability</td><td>90+ days</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Measured</td></tr>
         <tr><td class="mono">TF-11</td><td><b>&ldquo;Profile completed&rdquo; defined two ways</b> &mdash; 95% vs 25%</td><td>Definition</td><td>&mdash;</td><td><span class="status-pill missing"><i class="dot"></i>Blocks analysis</span></td><td>Measured</td></tr>
-        <tr><td class="mono">TF-01</td><td><b>Duplicate verification emails</b> &mdash; ~10,000 recipients</td><td>Acoustic</td><td>April 2026</td><td><span class="status-pill partial"><i class="dot"></i>Partly fixed</span></td><td>Reported</td></tr>
+        <tr><td class="mono">TF-01</td><td><b>Duplicate welcome emails</b> &mdash; 990 recipients, 993 extra copies</td><td>Acoustic</td><td>Jun 17 &ndash; Jul 1, 2026</td><td><span class="status-pill live"><i class="dot"></i>Ended Jul 1</span></td><td>Measured</td></tr>
         <tr><td class="mono">TF-02</td><td><b>Retry does not inspect the error</b> &mdash; will recur if codes return</td><td>Acoustic</td><td>April 2026</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Reported</td></tr>
-        <tr><td class="mono">TF-03</td><td><b>Acoustic template changed</b> &mdash; new click targets</td><td>Acoustic</td><td>Jul 9</td><td><span class="status-pill partial"><i class="dot"></i>Investigating</span></td><td>Confirmed</td></tr>
+        <tr><td class="mono">TF-03</td><td>Acoustic template changed &mdash; <b>not linked to TF-04</b> (verification email is Okta-sent, no link)</td><td>Acoustic</td><td>Jul 9</td><td><span class="status-pill live"><i class="dot"></i>Chain retired</span></td><td>Measured</td></tr>
         <tr><td class="mono">TF-08</td><td>Call-to-action below the fold at common zoom levels</td><td>Acoustic</td><td>Unknown</td><td><span class="status-pill partial"><i class="dot"></i>Unverified</span></td><td>From memory</td></tr>
         <tr><td class="mono">TF-09</td><td>Okta login loop</td><td>Okta</td><td>Unknown</td><td><span class="status-pill partial"><i class="dot"></i>Unverified</span></td><td>From memory</td></tr>
         <tr><td class="mono">TF-12</td><td>Pendo carries no SMS data &mdash; 119 pages tagged, zero events</td><td>Observability</td><td>&mdash;</td><td><span class="status-pill partial"><i class="dot"></i>By licence</span></td><td>Measured</td></tr>
         <tr><td class="mono">TF-15</td><td><b>Lead volume down 46%</b> &mdash; paid search &minus;57%, agency campaign &minus;98%</td><td>Demand</td><td>Q1&rarr;Aug 2026</td><td><span class="status-pill missing"><i class="dot"></i>Open &mdash; marketing</span></td><td>Measured</td></tr>
-        <tr><td class="mono">TF-13</td><td><b>Stages 3&ndash;4 emit no telemetry</b> &mdash; verification window leaves no trace anywhere</td><td>Observability</td><td>By design</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Confirmed</td></tr>
+        <tr><td class="mono">TF-16</td><td><b>12,000+ auth failures in 30 days</b> &mdash; sign-in/sign-up/password; ongoing since April</td><td>Okta</td><td>&ldquo;At least April&rdquo;</td><td><span class="status-pill partial"><i class="dot"></i>With Okta</span></td><td>Reported</td></tr>
+        <tr><td class="mono">TF-13</td><td><b>Stages 3&ndash;4 emit no telemetry</b> &mdash; code-based Okta email, nothing to click; needs Okta system logs</td><td>Observability</td><td>By design</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Confirmed</td></tr>
         <tr><td class="mono">TF-14</td><td><b>Trial length inconsistent</b> &mdash; 7 days in base config vs 30 days in marketing copy</td><td>Configuration</td><td>Unknown</td><td><span class="status-pill missing"><i class="dot"></i>Needs decision</span></td><td>Confirmed</td></tr>
       </tbody>
     </table>
@@ -771,12 +843,12 @@
   </div>
 
   <div class="callout finding">
-    <b>Seven of the fifteen have no owner</b> &mdash; including TF-06, the largest single issue in this report, and TF-05, where ~200 orders were never created. The Aug 27 session assigned investigation work but not these.
+    <b>Seven of the sixteen have no owner</b> &mdash; including TF-06, the largest single issue in this report, and TF-05, where ~200 orders were never created. The Aug 27 session assigned investigation work but not these.
   </div>
 </section>
 
 <section>
-  <div class="section-head"><span class="section-num">11</span><h2 class="section-title">Recommendations</h2></div>
+  <div class="section-head"><span class="section-num">13</span><h2 class="section-title">Recommendations</h2></div>
   <p class="lede">Roughly in priority order &mdash; the first two are cheap and point straight at the biggest number here.</p>
   <div class="reco-list">
     <div class="reco">
@@ -786,8 +858,8 @@
     </div>
     <div class="reco">
       <div class="reco-num">02</div><div class="reco-badge"><span class="badge now">Now</span></div>
-      <div class="reco-body"><h3>Pin the exact start and end dates of the duplicate-email window</h3>
-      <p>This is now the fastest test of the April step-change. If duplicate sends began with the April promo-code release and stopped when the missing column was added in late August, the dates should line up against the SAP order rate &mdash; and if they don't, the real April cause is still out there. Either answer is progress; right now TF-06 has a candidate and no verdict.</p></div>
+      <div class="reco-body"><h3>Reopen the April investigation &mdash; the duplicate-email theory is dead</h3>
+      <p>Duplicates are ruled out (Section 09), so the field is open again. The April boundary itself is solid &mdash; three independent datasets show it &mdash; which makes this the best-evidenced and least-explained finding in the report. Start with April release notes, SAP and middleware changes, and anything that shipped alongside the promo-code feature other than the email send itself.</p></div>
     </div>
     <div class="reco">
       <div class="reco-num">03</div><div class="reco-badge"><span class="badge now">Now</span></div>
@@ -834,7 +906,7 @@
 
 <section>
   <div class="col">
-    <div class="section-head"><span class="section-num">12</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
+    <div class="section-head"><span class="section-num">14</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
     <p><b>Sources.</b> (0) <span class="mono">Leads And Orders - All Leads.xlsx</span> &mdash; 23,571 SAP lead records with campaign attribution, Jan 1 &ndash; Aug 26, 2026. (1) <span class="mono">stuck-sms-no-sap-order_EOI_Match.xlsx</span> &mdash; a SAP BI EOI reconciliation export covering Jul 27 &ndash; Aug 18, 2026; 771 data rows. (2) Read-only queries against the SMS production database, authenticated via Azure AD; no credentials stored or transmitted.</p>
     <p><b>The export is a filtered list, not the full population.</b> It contains SMS subscriptions flagged as having no SAP order. SMS-wide, 2,081 trial subscriptions were created in the same window, so the 771 records represent about 37% of trials &mdash; every percentage in Section 03 is a share of that stuck subset, not of all trials.</p>
     <p><b>External vs. internal.</b> Records with an <span class="mono">@jjkeller.com</span> email are treated as internal (17 of 771) and excluded from Section 03 percentages.</p>
