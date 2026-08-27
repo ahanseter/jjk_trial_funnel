@@ -195,6 +195,23 @@
   .reco-body p{font-size:14.5px;color:var(--ink-2);margin-bottom:0}
   @media (max-width:640px){.reco{grid-template-columns:34px 1fr}.reco-badge{grid-column:2}.reco-body{grid-column:1/-1}}
 
+  /* timeline */
+  .tl{margin:32px 0 8px;position:relative;padding-left:26px}
+  .tl::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:var(--hairline)}
+  .tl-item{position:relative;padding:0 0 26px 0}
+  .tl-item:last-child{padding-bottom:0}
+  .tl-item::before{content:"";position:absolute;left:-24px;top:5px;width:11px;height:11px;border-radius:50%;background:var(--baseline);border:2px solid var(--surface);box-shadow:0 0 0 2px var(--hairline)}
+  .tl-item.bad::before{background:var(--critical);box-shadow:0 0 0 2px var(--critical-bg)}
+  .tl-item.warn::before{background:var(--serious);box-shadow:0 0 0 2px var(--serious-bg)}
+  .tl-item.good::before{background:var(--good);box-shadow:0 0 0 2px var(--good-bg)}
+  .tl-date{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:3px}
+  .tl-title{font-weight:700;font-size:15.5px;margin-bottom:3px}
+  .tl-body{font-size:14px;color:var(--ink-2);max-width:70ch}
+  .tl-tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:4px;margin-left:8px;vertical-align:2px;background:var(--hairline);color:var(--ink-muted)}
+  .tl-tag.measured{background:var(--brand-soft);color:var(--brand)}
+  .tl-tag.confirmed{background:var(--good-bg);color:var(--good)}
+  .tl-tag.reported{background:var(--serious-bg);color:var(--serious)}
+
   footer{padding:36px 32px 60px;border-top:1px solid var(--hairline)}
   footer .inner{max-width:1340px;margin:0 auto;display:flex;flex-wrap:wrap;gap:16px;align-items:center;font-size:12.5px;color:var(--ink-muted)}
   footer .inner .spacer{flex:1}
@@ -258,44 +275,53 @@
     <p><b>The single largest finding is a step-change in April.</b> SAP order creation ran at 70&ndash;74% through Q1, then fell to 55&ndash;59% in April and stayed there for four months. Okta provisioning, by contrast, has been flat all year. Something changed in April that is still costing roughly <b>15 points of order conversion on every trial</b>. A candidate has since emerged &mdash; the April promo-code release triggered duplicate verification emails to ~10,000 recipients &mdash; but it has not been shown to account for the whole drop.</p>
     <p>Two specific days broke outright. On <b>July 9</b>, Okta provisioning failed for ~57 people in three concentrated hourly windows &mdash; worst at 22:00, where only 2 of 22 trials got an account &mdash; while SAP ran normally. Marketing has since confirmed the Acoustic email template was changed <em>that same day</em>, which would explain it: no click, no Okta account. On <b>July 15&ndash;16</b>, the reverse pattern &mdash; Okta flawless, SAP order creation collapsed to under 4%, leaving ~200 trials with no order that appear never to have been backfilled.</p>
     <p>Within the EOI export itself, the stuck trials don't recover on their own: <b class="mono">752 of 768</b> are still on a trial subscription type today and <b class="mono">647</b> have run past their end date without converting.</p>
-    <p>Finally, this report documents what <em>isn't</em> measured &mdash; promo-click attribution and verification-email engagement have no connected data source in this pass. Section 07 lists each gap.</p>
+    <p>Finally, this report documents what <em>isn't</em> measured &mdash; promo-click attribution and verification-email engagement have no connected data source in this pass. Section 08 lists each gap.</p>
   </div>
 </section>
 
 <section>
   <div class="section-head"><span class="section-num">02</span><h2 class="section-title">The end-to-end flow</h2></div>
-  <p class="lede">Eight stages from marketing click to counted SAP order, mapped against what actually has a data source behind it today.</p>
+  <p class="lede">Nine stages from marketing click to active trial, per the process map agreed by the team. Each stage is marked with whether it can be measured today &mdash; and two of them cannot be measured at all.</p>
+
   <div class="funnel-scroll">
     <div class="funnel">
-      <div class="fnode"><div class="fbox gap"><div class="stage-eyebrow">01 &middot; not connected</div><div class="stage-name">Promo click</div><div class="stage-src">Google Analytics</div></div></div>
+      <div class="fnode"><div class="fbox measured"><div class="stage-eyebrow">01 &middot; visible</div><div class="stage-name">Marketing drives traffic</div><div class="stage-src">Promo code (C-number), material &amp; account code &middot; GA, Pendo</div></div></div>
       <div class="fconn">&rarr;</div>
-      <div class="fnode"><div class="fbox measured"><div class="stage-eyebrow">02 &middot; measured</div><div class="stage-name">Trial started in SMS</div><div class="stage-src">SMS DB &middot; 2,081 in window</div></div></div>
+      <div class="fnode"><div class="fbox measured"><div class="stage-eyebrow">02 &middot; visible</div><div class="stage-name">Sign-up form</div><div class="stage-src">Email + password only; codes ride in from the URL</div></div></div>
       <div class="fconn">&rarr;</div>
-      <div class="fnode"><div class="fbox gap"><div class="stage-eyebrow">03 &middot; not connected</div><div class="stage-name">Verification email sent / opened</div><div class="stage-src">Acoustic</div></div></div>
+      <div class="fnode"><div class="fbox critical"><div class="stage-eyebrow">03 &middot; blind</div><div class="stage-name">Verification requested</div><div class="stage-src">Temp record, 1-hour expiry &middot; no event emitted</div></div></div>
       <div class="fconn">&rarr;</div>
-      <div class="fnode"><div class="fbox critical"><div class="stage-eyebrow">04 &middot; measured</div><div class="stage-name">Okta account created</div><div class="stage-src">SMS DB &middot; 14.2% never get one</div></div></div>
+      <div class="fnode"><div class="fbox critical"><div class="stage-eyebrow">04 &middot; blind</div><div class="stage-name">Prospect verifies email</div><div class="stage-src">Temp record cleared &middot; no account exists yet</div></div></div>
       <div class="fconn">&rarr;</div>
-      <div class="fnode"><div class="fbox serious"><div class="stage-eyebrow">05 &middot; disputed</div><div class="stage-name">Profile completed</div><div class="stage-src">Definition unresolved &mdash; &sect;03</div></div></div>
+      <div class="fnode"><div class="fbox serious"><div class="stage-eyebrow">05 &middot; partial</div><div class="stage-name">Password set &mdash; account created</div><div class="stage-src">Okta identity + 4 SMS DB records &middot; 14.2% never get Okta</div></div></div>
       <div class="fconn">&rarr;</div>
-      <div class="fnode"><div class="fbox measured"><div class="stage-eyebrow">06 &middot; measured</div><div class="stage-name">SAP EOI match attempt</div><div class="stage-src">SAP BI export</div></div></div>
+      <div class="fnode"><div class="fbox critical"><div class="stage-eyebrow">06 &middot; partial &middot; the gate</div><div class="stage-name">Mandatory profile completed</div><div class="stage-src">Name, company, phone, job title, address &mdash; triggers everything downstream</div></div></div>
       <div class="fconn">&rarr;</div>
-      <div class="fnode foutcomes">
-        <div class="fbox good"><div class="stage-eyebrow">outcome &middot; 13.8%</div><div class="stage-name">SAP account + order found</div></div>
-        <div class="fbox serious"><div class="stage-eyebrow">outcome &middot; 4.4%</div><div class="stage-name">Matched, blocked on data</div></div>
-        <div class="fbox critical"><div class="stage-eyebrow">outcome &middot; 81.8%</div><div class="stage-name">No SAP match &mdash; lost</div></div>
-      </div>
+      <div class="fnode"><div class="fbox measured"><div class="stage-eyebrow">07 &middot; visible</div><div class="stage-name">Trial order created in SAP</div><div class="stage-src">Async via Service Bus &middot; 32.8% never get one</div></div></div>
+      <div class="fconn">&rarr;</div>
+      <div class="fnode"><div class="fbox measured"><div class="stage-eyebrow">08 &middot; visible</div><div class="stage-name">Welcome email sent</div><div class="stage-src">Silverpop &middot; fires only on successful order</div></div></div>
+      <div class="fconn">&rarr;</div>
+      <div class="fnode"><div class="fbox serious"><div class="stage-eyebrow">09 &middot; partial</div><div class="stage-name">Trial is active</div><div class="stage-src">Start + expiry per configuration</div></div></div>
     </div>
   </div>
   <div class="funnel-legend">
-    <span><i class="swatch" style="background:var(--brand-line)"></i>Measured today</span>
-    <span><i class="swatch" style="background:var(--gap-ink)"></i>Not connected in this pass</span>
-    <span><i class="swatch" style="background:var(--good)"></i>Recoverable</span>
-    <span><i class="swatch" style="background:var(--serious)"></i>Blocked on data</span>
-    <span><i class="swatch" style="background:var(--critical)"></i>Lost</span>
+    <span><i class="swatch" style="background:var(--brand-line)"></i>Measurable today</span>
+    <span><i class="swatch" style="background:var(--serious)"></i>Partially measurable</span>
+    <span><i class="swatch" style="background:var(--critical)"></i>Blind &mdash; or the gate</span>
   </div>
-  <p class="lede" style="margin-top:22px">Outcome percentages are shares of the <em>stuck</em> population (n&nbsp;=&nbsp;754 external), not of all trials &mdash; Section 03 measures each stage against all 29,285 trials this year. Only stage 03 (verification email) remains fully unmeasured; Okta turned out to be readable directly from the SMS database via the user record's Okta ID, so it is now a hard number rather than a gap.</p>
-</section>
 
+  <div class="callout finding">
+    <b>Stage 6 is a gate, not a step &mdash; and that reframes the whole report.</b> The SAP trial order and the welcome email are triggered <em>only</em> when the mandatory profile is completed for the first time. Abandon before stage 6 and there is no SAP order and no welcome email <b>by design</b>. So the correlation in Section 04 &mdash; that 99.6% of trials with an incomplete profile have no SAP match &mdash; is not evidence of a broken integration. It is the system behaving exactly as specified. <b>The real question is not why SAP is missing records; it is why so few people finish the profile form.</b>
+  </div>
+
+  <div class="callout">
+    <b>Stages 3 and 4 emit no telemetry whatsoever.</b> Between requesting a verification code and entering it, the application records nothing durable &mdash; the temporary record is deleted on use or after one hour, and no event is fired. The same is true if Terms of Use are declined. Anyone who abandons in that window leaves <b>no trace in any system</b>: not in the SMS database, not in Pendo, not in Elastic. This is the single largest measurement hole in the funnel, and it sits directly on top of the verification-email step we most want to understand after the July 9 template change.
+  </div>
+
+  <div class="callout finding">
+    <b>Open question carried over from the process map: how long is a trial?</b> The base configuration says <b>7 days</b>; marketing copy says <b>30 days</b>. The live value comes from a deployment setting that is not in source control, so it cannot be resolved by reading the code &mdash; someone has to check the running production configuration. Until it is settled, every expiry-based figure in this report inherits the ambiguity.
+  </div>
+</section>
 <section>
   <div class="section-head"><span class="section-num">03</span><h2 class="section-title">Every drop-off point</h2></div>
   <p class="lede">Each stage measured independently against all <b>29,285</b> external trials created Jan 1 &ndash; Aug 23, 2026. Measured as independent conditions, not a strict sequence &mdash; a trial can clear a later stage while failing an earlier one, and many do.</p>
@@ -417,7 +443,84 @@
 </section>
 
 <section>
-  <div class="section-head"><span class="section-num">05</span><h2 class="section-title">Inside the EOI reconciliation export</h2></div>
+  <div class="section-head"><span class="section-num">05</span><h2 class="section-title">Timeline of key events</h2></div>
+  <p class="lede">Everything currently known about when things changed and when they broke, in order. Each entry is tagged with how it is known &mdash; measured from data, confirmed by someone with access, or reported in discussion.</p>
+
+  <div class="tl">
+    <div class="tl-item bad">
+      <div class="tl-date">April 2026 &mdash; exact date unknown</div>
+      <div class="tl-title">Promo-code feature released<span class="tl-tag reported">Reported</span></div>
+      <div class="tl-body">Its Acoustic send wrote to a column that did not exist, so every send returned an error and the retry fired five minutes later. Result: <b>duplicate verification emails to roughly 10,000 recipients</b>. Pinning the exact release date is the single most useful outstanding task.</div>
+    </div>
+    <div class="tl-item bad">
+      <div class="tl-date">April 2026</div>
+      <div class="tl-title">SAP order creation steps down, 73% &rarr; 56%<span class="tl-tag measured">Measured</span></div>
+      <div class="tl-body">Monthly order rate falls from the 70&ndash;74% Q1 plateau to 55&ndash;59% and stays there for four months. Same month as the promo-code release &mdash; the two are plausibly linked, but that has not been demonstrated.</div>
+    </div>
+    <div class="tl-item warn">
+      <div class="tl-date">April 24, 2026</div>
+      <div class="tl-title">Worst SAP day of the month &mdash; 36% of 164 trials<span class="tl-tag measured">Measured</span></div>
+      <div class="tl-body">Well below even the depressed April average.</div>
+    </div>
+    <div class="tl-item bad">
+      <div class="tl-date">July 9, 2026</div>
+      <div class="tl-title">Acoustic email template changed<span class="tl-tag confirmed">Confirmed</span></div>
+      <div class="tl-body">Marketing confirmed the change on Aug 27. It altered where recipients could click &mdash; additional click targets appeared.</div>
+    </div>
+    <div class="tl-item bad">
+      <div class="tl-date">July 9, 2026 &mdash; same day</div>
+      <div class="tl-title">Okta provisioning fails for ~57 people<span class="tl-tag measured">Measured</span></div>
+      <div class="tl-body">63.2% of 155 trials received an Okta account against a ~85% norm, concentrated at 16:00, 17:00 and worst at 22:00 (<b>2 of 22</b>). SAP ran at 71% that day &mdash; above average &mdash; so the order path was healthy. The chain <em>template change &rarr; fewer clicks &rarr; fewer Okta accounts</em> fits the timing exactly but is not proven. Those users still cannot sign in.</div>
+    </div>
+    <div class="tl-item bad">
+      <div class="tl-date">July 15&ndash;16, 2026</div>
+      <div class="tl-title">SAP order creation collapses &mdash; ~200 trials affected<span class="tl-tag measured">Measured</span></div>
+      <div class="tl-body">1.9% then 3.1%, against a ~56% norm: five orders from 206 trials. Okta was flawless both days (108/108, 98/98), isolating the fault to the SAP path. No sign these were ever backfilled.</div>
+    </div>
+    <div class="tl-item warn">
+      <div class="tl-date">July 17, 2026</div>
+      <div class="tl-title">Okta dips again &mdash; 62.5%<span class="tl-tag measured">Measured</span></div>
+      <div class="tl-body">Part of a recurring pattern of Okta dips into the 50&ndash;65% band throughout the year.</div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">July 27 &ndash; August 18, 2026</div>
+      <div class="tl-title">EOI reconciliation export window<span class="tl-tag measured">Measured</span></div>
+      <div class="tl-body">771 stuck trials captured, 37% of the 2,081 created in the same period. Section 06 covers this in detail.</div>
+    </div>
+    <div class="tl-item bad">
+      <div class="tl-date">August 19, 2026</div>
+      <div class="tl-title">Worst Okta day of the year &mdash; 50.0% of 154 trials<span class="tl-tag measured">Measured</span></div>
+      <div class="tl-body">Half of that day's signups never got an account. No corresponding SAP anomaly.</div>
+    </div>
+    <div class="tl-item warn">
+      <div class="tl-date">August 2026</div>
+      <div class="tl-title">Switch from promo code to verification link<span class="tl-tag reported">Reported</span></div>
+      <div class="tl-body">Simplified the flow. Incidentally stopped the duplicate-send path, since the promo-code send was the trigger.</div>
+    </div>
+    <div class="tl-item warn">
+      <div class="tl-date">August 24, 2026</div>
+      <div class="tl-title">Okta dips to 56.6%<span class="tl-tag measured">Measured</span></div>
+      <div class="tl-body">Second-worst Okta day of the year, five days after the worst.</div>
+    </div>
+    <div class="tl-item good">
+      <div class="tl-date">~3rd week August 2026</div>
+      <div class="tl-title">Duplicate-email trigger fixed<span class="tl-tag reported">Reported</span></div>
+      <div class="tl-body">The missing column was added, so sends stopped erroring and the five-minute resend stopped firing. <b>The retry logic itself was not fixed</b> &mdash; it still resends without checking which error it received, so the fault returns if promo codes are re-enabled (TF-02).</div>
+    </div>
+    <div class="tl-item good">
+      <div class="tl-date">August 27, 2026</div>
+      <div class="tl-title">Process-mapping session; this report compiled<span class="tl-tag confirmed">Confirmed</span></div>
+      <div class="tl-body">The July 9 template change was confirmed, the duplicate-send mechanism described, and the issue register agreed. Six of twelve issues still have no owner.</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>What the timeline makes visible.</b> The two July incidents are near-perfect mirrors &mdash; on the 9th Okta broke while SAP was healthy; on the 15th&ndash;16th SAP broke while Okta was perfect. That symmetry is useful: it means the two paths fail independently, so a single shared root cause is unlikely, and each needs its own fix. It also means neither incident explains the April step-change, which sits above both and remains unattributed.
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><span class="section-num">06</span><h2 class="section-title">Inside the EOI reconciliation export</h2></div>
   <p class="lede">771 records, Jul 27 &ndash; Aug 18, 2026 (<span class="mono">stuck-sms-no-sap-order_EOI_Match.xlsx</span>). 17 are internal <span class="mono">@jjkeller.com</span> accounts on non-trial material and are excluded from the percentages below.</p>
 
   <div class="tiles">
@@ -448,7 +551,7 @@
   </div>
 
   <div class="callout finding">
-    <b>The correlation that matters:</b> among stuck trials that never completed the SMS profile (n&nbsp;=&nbsp;536), <b>99.6% have no SAP match at all</b>. Among those that did complete it (n&nbsp;=&nbsp;188), the no-match rate drops to <b>30.9%</b> and a real SAP order is the single most common outcome (<b>52.7%</b>). Profile completion looks less like a correlate of success and more like a precondition for the SAP sync to have any chance of running.
+    <b>The correlation &mdash; and what it actually means:</b> among stuck trials that never completed the SMS profile (n&nbsp;=&nbsp;536), <b>99.6% have no SAP match at all</b>. Among those that did complete it (n&nbsp;=&nbsp;188), the no-match rate drops to <b>30.9%</b> and a real SAP order is the most common outcome (<b>52.7%</b>). The process map explains why: profile completion is the <b>trigger</b> for the SAP order, so an incomplete profile produces no order <em>by design</em>. This is therefore not evidence of a broken integration &mdash; it is a conversion problem. The remaining 30.9% no-match rate <em>among completed profiles</em> is the part that does point at a genuine fault.
   </div>
 
   <div class="chart-card">
@@ -504,7 +607,7 @@
 </section>
 
 <section>
-  <div class="section-head"><span class="section-num">06</span><h2 class="section-title">Volume in context</h2></div>
+  <div class="section-head"><span class="section-num">07</span><h2 class="section-title">Volume in context</h2></div>
   <p class="lede">How this window sits inside the full year &mdash; queried directly from <span class="mono">Auth.Subscription</span> in production.</p>
   <div class="tiles">
     <div class="tile"><div class="v">38,278</div><div class="l">new subscriptions, Jan 1 &ndash; Aug 27, 2026</div></div>
@@ -550,7 +653,7 @@
 </section>
 
 <section>
-  <div class="section-head"><span class="section-num">07</span><h2 class="section-title">Data source coverage</h2></div>
+  <div class="section-head"><span class="section-num">08</span><h2 class="section-title">Data source coverage</h2></div>
   <p class="lede">What's wired into this report versus what the whiteboard walkthrough calls for.</p>
   <div class="table-wrap">
     <table>
@@ -558,7 +661,7 @@
       <tbody>
         <tr><td>SMS production DB</td><td>Trial creation, profile completion, live status</td><td><span class="status-pill live"><i class="dot"></i>Live</span></td><td>Read-only queries against the SMS production database via Azure AD</td></tr>
         <tr><td>SAP BI EOI export</td><td>Order match / creation</td><td><span class="status-pill live"><i class="dot"></i>Live</span></td><td>Manual <span class="mono">.xlsx</span> export today; used the Jul 27 &ndash; Aug 18 pull</td></tr>
-        <tr><td>Pendo</td><td>Trial-start click, profile-form engagement</td><td><span class="status-pill missing"><i class="dot"></i>Not licensed</span></td><td>JJK does not license Pendo Analytics &mdash; this source is unavailable by subscription, not by configuration. Do not plan around it.</td></tr>
+        <tr><td>Pendo</td><td>Trial-start click, profile-form engagement</td><td><span class="status-pill missing"><i class="dot"></i>No SMS data</span></td><td>API and aggregation both work. But across three years and all event types, only the Encompass app reports data &mdash; SMS has <b>119 pages tagged and zero events, ever</b>. Analytics is licensed for Encompass, not SMS.</td></tr>
         <tr><td>Elastic APM (RUM)</td><td>Profile-form page views and interactions</td><td><span class="status-pill missing"><i class="dot"></i>Capturing no page views</span></td><td>Agent is live in prod but records <b>zero transactions</b> &mdash; see the finding below. Errors only.</td></tr>
         <tr><td>Application Insights</td><td>Front-end page views, client errors</td><td><span class="status-pill partial"><i class="dot"></i>Wired, not yet queried</span></td><td>Runs in parallel with Elastic APM; the remaining candidate for front-end funnel data.</td></tr>
         <tr><td>Acoustic</td><td>Verification email sent / opened / clicked / bounced</td><td><span class="status-pill missing"><i class="dot"></i>Not connected</span></td><td>No API or export access from this session</td></tr>
@@ -580,8 +683,8 @@
 </section>
 
 <section>
-  <div class="section-head"><span class="section-num">08</span><h2 class="section-title">Issue register</h2></div>
-  <p class="lede">Every known issue in one place, with what broke, when it started, and whether it is closed &mdash; the format agreed in the Aug 27 process-mapping session. Maintained as a shared spreadsheet; this table is the snapshot.</p>
+  <div class="section-head"><span class="section-num">09</span><h2 class="section-title">Issue register</h2></div>
+  <p class="lede">All fourteen known issues in one place, with what broke, when it started, and whether it is closed &mdash; the format agreed in the Aug 27 process-mapping session. Maintained as a shared spreadsheet; this table is the snapshot.</p>
 
   <div class="table-wrap">
     <table>
@@ -598,7 +701,9 @@
         <tr><td class="mono">TF-03</td><td><b>Acoustic template changed</b> &mdash; new click targets</td><td>Acoustic</td><td>Jul 9</td><td><span class="status-pill partial"><i class="dot"></i>Investigating</span></td><td>Confirmed</td></tr>
         <tr><td class="mono">TF-08</td><td>Call-to-action below the fold at common zoom levels</td><td>Acoustic</td><td>Unknown</td><td><span class="status-pill partial"><i class="dot"></i>Unverified</span></td><td>From memory</td></tr>
         <tr><td class="mono">TF-09</td><td>Okta login loop</td><td>Okta</td><td>Unknown</td><td><span class="status-pill partial"><i class="dot"></i>Unverified</span></td><td>From memory</td></tr>
-        <tr><td class="mono">TF-12</td><td>Pendo Analytics not licensed</td><td>Observability</td><td>&mdash;</td><td><span class="status-pill live"><i class="dot"></i>Won't fix</span></td><td>Confirmed</td></tr>
+        <tr><td class="mono">TF-12</td><td>Pendo carries no SMS data &mdash; 119 pages tagged, zero events</td><td>Observability</td><td>&mdash;</td><td><span class="status-pill partial"><i class="dot"></i>By licence</span></td><td>Measured</td></tr>
+        <tr><td class="mono">TF-13</td><td><b>Stages 3&ndash;4 emit no telemetry</b> &mdash; verification window leaves no trace anywhere</td><td>Observability</td><td>By design</td><td><span class="status-pill missing"><i class="dot"></i>Open</span></td><td>Confirmed</td></tr>
+        <tr><td class="mono">TF-14</td><td><b>Trial length inconsistent</b> &mdash; 7 days in base config vs 30 days in marketing copy</td><td>Configuration</td><td>Unknown</td><td><span class="status-pill missing"><i class="dot"></i>Needs decision</span></td><td>Confirmed</td></tr>
       </tbody>
     </table>
   </div>
@@ -608,12 +713,12 @@
   </div>
 
   <div class="callout finding">
-    <b>Six of the twelve have no owner</b> &mdash; including TF-06, the largest single issue in this report, and TF-05, where ~200 orders were never created. The Aug 27 session assigned investigation work but not these.
+    <b>Six of the fourteen have no owner</b> &mdash; including TF-06, the largest single issue in this report, and TF-05, where ~200 orders were never created. The Aug 27 session assigned investigation work but not these.
   </div>
 </section>
 
 <section>
-  <div class="section-head"><span class="section-num">09</span><h2 class="section-title">Recommendations</h2></div>
+  <div class="section-head"><span class="section-num">10</span><h2 class="section-title">Recommendations</h2></div>
   <p class="lede">Roughly in priority order &mdash; the first two are cheap and point straight at the biggest number here.</p>
   <div class="reco-list">
     <div class="reco">
@@ -633,8 +738,8 @@
     </div>
     <div class="reco">
       <div class="reco-num">04</div><div class="reco-badge"><span class="badge next">Next</span></div>
-      <div class="reco-body"><h3>Settle what &ldquo;profile completed&rdquo; actually means</h3>
-      <p>This report's location-address proxy says 95% incomplete; the EOI export's own column says 25%. Until someone reconciles those definitions, no one should act on either number &mdash; and the profile stage can't be trusted in any funnel view.</p></div>
+      <div class="reco-body"><h3>Attack profile completion as a conversion problem</h3>
+      <p>Now that stage 6 is confirmed as the trigger for everything downstream, this stops being an integration question and becomes a form-design one: shorten it, pre-fill what sign-up and the promo code already supply, or stage the fields so the order fires earlier. Separately, the two competing definitions of &ldquo;profile complete&rdquo; (95% incomplete by location-address proxy, 25% by the EOI column) still need reconciling before either number is quoted.</p></div>
     </div>
     <div class="reco">
       <div class="reco-num">05</div><div class="reco-badge"><span class="badge next">Next</span></div>
@@ -659,14 +764,14 @@
     <div class="reco">
       <div class="reco-num">09</div><div class="reco-badge"><span class="badge later">Later</span></div>
       <div class="reco-body"><h3>Fix Elastic RUM transaction capture &mdash; it is the cheapest route to front-end visibility</h3>
-      <p>The browser agent is already deployed, licensed and reporting; it just isn't recording page views (&sect;07). If the <span class="mono">apm.init()</span> placement is the cause, this is a small change that unlocks the profile-form question, the signup funnel, and front-end performance data at once. Pendo can't fill this gap &mdash; JJK doesn't license Analytics &mdash; and Acoustic remains the only route to email-verification data.</p></div>
+      <p>The browser agent is already deployed, licensed and reporting; it just isn't recording page views (&sect;08). If the <span class="mono">apm.init()</span> placement is the cause, this is a small change that unlocks the profile-form question, the signup funnel, and front-end performance data at once. Pendo can't fill this gap &mdash; SMS sends it no data at all &mdash; and Acoustic remains the only route to email-verification data.</p></div>
     </div>
   </div>
 </section>
 
 <section>
   <div class="col">
-    <div class="section-head"><span class="section-num">10</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
+    <div class="section-head"><span class="section-num">11</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
     <p><b>Sources.</b> (1) <span class="mono">stuck-sms-no-sap-order_EOI_Match.xlsx</span> &mdash; a SAP BI EOI reconciliation export covering Jul 27 &ndash; Aug 18, 2026; 771 data rows. (2) Read-only queries against the SMS production database, authenticated via Azure AD; no credentials stored or transmitted.</p>
     <p><b>The export is a filtered list, not the full population.</b> It contains SMS subscriptions flagged as having no SAP order. SMS-wide, 2,081 trial subscriptions were created in the same window, so the 771 records represent about 37% of trials &mdash; every percentage in Section 03 is a share of that stuck subset, not of all trials.</p>
     <p><b>External vs. internal.</b> Records with an <span class="mono">@jjkeller.com</span> email are treated as internal (17 of 771) and excluded from Section 03 percentages.</p>
