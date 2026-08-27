@@ -2,7 +2,7 @@ name: Deploy report to GitHub Pages
 
 on:
   push:
-    branches: [report-trial-funnel]
+    branches: [main, report-trial-funnel]
   workflow_dispatch:
 
 permissions:
