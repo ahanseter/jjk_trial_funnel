@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>SMS Trial Funnel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page:#faf8f8; --surface:#fffdfd; --ink:#171012; --ink-2:#574a4e; --ink-muted:#8b7d82;
+    --hairline:#e8dfe2; --baseline:#c9bcc0;
+    --brand:#902147; --brand-deep:#58132a; --brand-soft:#f7eaef; --brand-line:#902147;
+    --good:#0ca30c; --good-bg:#e6f6e6;
+    --serious:#ec835a; --serious-bg:#fdece4;
+    --critical:#d03b3b; --critical-bg:#fbe7e7;
+    --s-okta:#2a78d6; --s-sap:#902147;
+    --gap-ink:#a2969a;
+    --chip:#ffffff;
+    --shadow:0 1px 2px rgba(23,16,18,.04),0 8px 24px -12px rgba(23,16,18,.14);
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --page:#100c0d; --surface:#1c1618; --ink:#fdfbfb; --ink-2:#c8babe; --ink-muted:#8b7d82;
+      --hairline:#2e2528; --baseline:#3d3235;
+      --brand:#d36989; --brand-deep:#d36989; --brand-soft:#2a1219; --brand-line:#d36989;
+      --good:#0ca30c; --good-bg:#12280f;
+      --serious:#ec835a; --serious-bg:#2c1811;
+      --critical:#e66767; --critical-bg:#2c1414;
+      --s-okta:#3987e5; --s-sap:#d36989;
+      --gap-ink:#6e6367;
+      --chip:#fffdfd;
+      --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px -12px rgba(0,0,0,.6);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --page:#100c0d; --surface:#1c1618; --ink:#fdfbfb; --ink-2:#c8babe; --ink-muted:#8b7d82;
+    --hairline:#2e2528; --baseline:#3d3235;
+    --brand:#d36989; --brand-deep:#d36989; --brand-soft:#2a1219; --brand-line:#d36989;
+    --good:#0ca30c; --good-bg:#12280f;
+    --serious:#ec835a; --serious-bg:#2c1811;
+    --critical:#e66767; --critical-bg:#2c1414;
+    --s-okta:#3987e5; --s-sap:#d36989;
+    --gap-ink:#6e6367;
+    --chip:#fffdfd;
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 24px -12px rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--page);color:var(--ink);font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  ::selection{background:var(--brand-soft)}
+  .wrap{max-width:1340px;margin:0 auto;padding:0 32px 96px}
+  .col{max-width:700px;margin:0 auto}
+  h1,h2{font-family:"Source Serif 4",Georgia,serif;font-weight:700;letter-spacing:-0.012em;text-wrap:balance;margin:0;color:var(--ink)}
+  h3{font-family:"Public Sans",sans-serif;font-weight:700;margin:0;color:var(--ink)}
+  .mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-muted)}
+  a{color:var(--brand)}
+  p{margin:0 0 16px}
+  .col p:last-child{margin-bottom:0}
+
+  /* ---- gate ---- */
+  #gate{position:fixed;inset:0;background:var(--page);z-index:999;display:flex;align-items:center;justify-content:center;padding:24px}
+  #gate .box{max-width:410px;width:100%;background:var(--surface);border:1px solid var(--hairline);border-top:3px solid var(--brand);border-radius:12px;padding:32px;box-shadow:var(--shadow)}
+  #gate .mark{width:26px;margin-bottom:18px;display:block}
+  #gate h2{font-size:25px;margin-bottom:10px}
+  #gate p{font-size:14px;color:var(--ink-2)}
+  #gate label{display:block;font-family:"IBM Plex Mono",monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-muted);margin:20px 0 8px}
+  #gate input{width:100%;padding:11px 13px;font-family:"IBM Plex Mono",monospace;font-size:14px;background:var(--page);color:var(--ink);border:1px solid var(--baseline);border-radius:7px}
+  #gate input:focus{outline:2px solid var(--brand);outline-offset:1px;border-color:transparent}
+  #gate button{margin-top:14px;width:100%;padding:11px;font-family:"Public Sans",sans-serif;font-weight:600;font-size:14.5px;background:var(--brand);color:#fff;border:none;border-radius:7px;cursor:pointer}
+  #gate button:hover{background:var(--brand-deep)}
+  #gate button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  #gate .err{color:var(--critical);font-size:13px;margin-top:12px;min-height:18px}
+  #gate .note{font-size:11.5px;color:var(--ink-muted);margin-top:18px;border-top:1px solid var(--hairline);padding-top:14px;line-height:1.45}
+  body.locked{overflow:hidden}
+  #content[hidden]{display:none}
+
+  /* ---- masthead ---- */
+  header.masthead{border-bottom:1px solid var(--hairline);padding:34px 32px 40px;background:linear-gradient(180deg,var(--brand-soft) 0%,transparent 62%)}
+  .masthead-inner{max-width:1340px;margin:0 auto}
+  .brandbar{display:flex;align-items:center;gap:13px;padding-bottom:26px;margin-bottom:30px;border-bottom:1px solid var(--hairline)}
+  .brandbar .chip{background:var(--chip);border-radius:7px;padding:6px 7px;display:flex;line-height:0;box-shadow:0 1px 2px rgba(23,16,18,.10)}
+  .brandbar .chip svg{width:19px;height:auto;display:block}
+  .brandbar .lockup{display:flex;flex-direction:column;gap:1px}
+  .brandbar .lockup .co{font-weight:700;font-size:14px;letter-spacing:-0.005em;color:var(--ink)}
+  .brandbar .lockup .prod{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-muted)}
+  .brandbar .spacer{flex:1}
+  .brandbar .conf{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--brand);border:1px solid var(--brand);padding:4px 9px;border-radius:20px;white-space:nowrap}
+  .kicker{display:flex;gap:10px;align-items:center;margin-bottom:16px}
+  .kicker .dot{width:7px;height:7px;border-radius:50%;background:var(--brand);flex:none}
+  h1.title{font-size:clamp(38px,5.6vw,66px);line-height:1.02;margin-bottom:20px;max-width:15ch}
+  .subhead{font-size:18px;color:var(--ink-2);max-width:640px}
+  .meta-row{display:flex;flex-wrap:wrap;gap:28px;margin-top:32px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-muted)}
+  .meta-row b{color:var(--ink-2);font-weight:600}
+  .hero-stat{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:center;margin-top:40px;padding-top:36px;border-top:1px solid var(--hairline)}
+  .hero-figure{font-family:"Source Serif 4",Georgia,serif;font-weight:700;font-size:clamp(66px,10vw,120px);line-height:.9;color:var(--brand);white-space:nowrap;letter-spacing:-0.02em}
+  .hero-figure sup{font-size:.34em;top:-.62em}
+  .hero-copy{max-width:540px;font-size:16.5px;color:var(--ink-2)}
+  .hero-copy strong{color:var(--ink)}
+  @media (max-width:720px){.hero-stat{grid-template-columns:1fr;gap:20px}}
+
+  section{padding:64px 0;border-bottom:1px solid var(--hairline)}
+  section:last-of-type{border-bottom:none}
+  .section-head{display:flex;align-items:baseline;gap:16px;margin-bottom:26px}
+  .section-num{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--brand);letter-spacing:.06em}
+  h2.section-title{font-size:clamp(25px,3.2vw,36px)}
+  .lede{font-size:17px;color:var(--ink-2);max-width:680px;margin-top:14px}
+
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;background:var(--hairline);border:1px solid var(--hairline);border-radius:10px;overflow:hidden;margin:28px 0}
+  .tile{background:var(--surface);padding:22px 20px}
+  .tile .v{font-family:"Source Serif 4",Georgia,serif;font-weight:700;font-size:33px;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-0.015em}
+  .tile .v small{font-size:16px;font-weight:600;color:var(--ink-muted);margin-left:1px}
+  .tile .l{font-size:12.5px;color:var(--ink-muted);margin-top:9px;line-height:1.35}
+  .tile.accent .v{color:var(--brand)}
+
+  .funnel-scroll{overflow-x:auto;margin:36px 0 12px;padding-bottom:8px}
+  .funnel{display:flex;align-items:stretch;min-width:1180px}
+  .fnode{flex:1 1 0;display:flex;flex-direction:column}
+  .fbox{border-radius:10px;padding:16px 14px;min-height:104px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+  .fbox .stage-eyebrow{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase}
+  .fbox .stage-name{font-weight:700;font-size:14.5px;line-height:1.25}
+  .fbox .stage-src{font-size:11.5px;color:var(--ink-muted)}
+  .fbox.measured{background:var(--brand-soft);border:1.5px solid var(--brand-line)}
+  .fbox.measured .stage-eyebrow{color:var(--brand)}
+  .fbox.gap{border:1.5px dashed var(--gap-ink)}
+  .fbox.gap .stage-eyebrow,.fbox.gap .stage-name{color:var(--gap-ink)}
+  .fbox.good{background:var(--good-bg);border:1.5px solid var(--good)}
+  .fbox.good .stage-eyebrow{color:var(--good)}
+  .fbox.serious{background:var(--serious-bg);border:1.5px solid var(--serious)}
+  .fbox.serious .stage-eyebrow{color:var(--serious)}
+  .fbox.critical{background:var(--critical-bg);border:1.5px solid var(--critical)}
+  .fbox.critical .stage-eyebrow{color:var(--critical)}
+  .fconn{flex:0 0 30px;display:flex;align-items:center;justify-content:center;color:var(--baseline);font-size:19px;align-self:center}
+  .foutcomes{display:flex;flex-direction:column;gap:8px;flex:1 1 0}
+  .foutcomes .fbox{min-height:48px}
+  .funnel-legend{display:flex;flex-wrap:wrap;gap:20px;margin-top:18px;font-size:12.5px;color:var(--ink-muted)}
+  .funnel-legend span{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:11px;height:11px;border-radius:3px;display:inline-block;flex:none}
+
+  .chart-card{background:var(--surface);border:1px solid var(--hairline);border-radius:12px;padding:28px 28px 22px;margin:24px 0;box-shadow:var(--shadow)}
+  .chart-title{font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2);margin-bottom:4px}
+  .chart-sub{font-size:12.5px;color:var(--ink-muted);margin-bottom:22px}
+  .hbar-row{display:grid;grid-template-columns:210px 1fr 104px;align-items:center;gap:14px;margin-bottom:16px}
+  .hbar-row:last-child{margin-bottom:0}
+  .hbar-label{font-size:13.5px;color:var(--ink-2);text-align:right}
+  .hbar-track{background:var(--hairline);border-radius:5px;height:22px;overflow:hidden}
+  .hbar-fill{height:100%;border-radius:5px}
+  .hbar-val{font-family:"IBM Plex Mono",monospace;font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .hbar-val small{color:var(--ink-muted)}
+  @media (max-width:620px){.hbar-row{grid-template-columns:1fr;gap:6px}.hbar-label{text-align:left}}
+
+  .stack-chart{display:flex;flex-direction:column;gap:22px}
+  .stack-row .stack-label{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:var(--ink-2);margin-bottom:7px}
+  .stack-row .stack-label b{color:var(--ink);font-family:"IBM Plex Mono",monospace;font-weight:500;white-space:nowrap}
+  .stack-track{display:flex;height:28px;border-radius:6px;overflow:hidden;background:var(--hairline);gap:2px}
+  .stack-seg{height:100%}
+  .stack-seg.critical{background:var(--critical)}
+  .stack-seg.serious{background:var(--serious)}
+  .stack-seg.good{background:var(--good)}
+  .chart-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:18px;font-size:12px;color:var(--ink-muted)}
+  .chart-legend span{display:inline-flex;align-items:center;gap:6px}
+  .spark{width:100%;height:190px;display:block}
+
+  .table-wrap{overflow-x:auto;margin:20px 0;border:1px solid var(--hairline);border-radius:10px}
+  table{width:100%;border-collapse:collapse;font-size:14px;background:var(--surface)}
+  table th,table td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--hairline);vertical-align:top}
+  table thead th{font-family:"IBM Plex Mono",monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted);font-weight:500;white-space:nowrap}
+  table tbody tr:last-child td{border-bottom:none}
+  table td.num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+  .status-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
+  .status-pill.live{background:var(--good-bg);color:var(--good)}
+  .status-pill.partial{background:var(--serious-bg);color:var(--serious)}
+  .status-pill.missing{background:var(--critical-bg);color:var(--critical)}
+  .status-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+
+  .callout{background:var(--surface);border:1px solid var(--hairline);border-left:4px solid var(--brand);border-radius:8px;padding:20px 24px;margin:24px 0;font-size:15px;color:var(--ink-2)}
+  .callout b{color:var(--ink)}
+  .callout.finding{border-left-color:var(--critical)}
+
+  .reco-list{display:flex;flex-direction:column;margin-top:28px}
+  .reco{display:grid;grid-template-columns:48px 96px 1fr;gap:20px;padding:20px 0;border-top:1px solid var(--hairline)}
+  .reco:last-child{border-bottom:1px solid var(--hairline)}
+  .reco-num{font-family:"Source Serif 4",Georgia,serif;font-weight:700;font-size:26px;color:var(--gap-ink);font-variant-numeric:tabular-nums}
+  .badge{font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:4px 9px;border-radius:5px;display:inline-block;margin-top:5px}
+  .badge.now{background:var(--critical-bg);color:var(--critical)}
+  .badge.next{background:var(--serious-bg);color:var(--serious)}
+  .badge.later{background:var(--brand-soft);color:var(--brand)}
+  .reco-body h3{font-size:16.5px;margin-bottom:6px}
+  .reco-body p{font-size:14.5px;color:var(--ink-2);margin-bottom:0}
+  @media (max-width:640px){.reco{grid-template-columns:34px 1fr}.reco-badge{grid-column:2}.reco-body{grid-column:1/-1}}
+
+  footer{padding:36px 32px 60px;border-top:1px solid var(--hairline)}
+  footer .inner{max-width:1340px;margin:0 auto;display:flex;flex-wrap:wrap;gap:16px;align-items:center;font-size:12.5px;color:var(--ink-muted)}
+  footer .inner .spacer{flex:1}
+</style>
+</head>
+<body class="locked">
+
+<div id="gate">
+  <div class="box">
+    <svg class="mark" viewBox="0 0 32 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g fill="#902147"><path d="M31.9 27.9C25.4 33.9 19.8 43 17.4 50h-.6c2.4-7.1 8.2-16.8 15.1-22.8Z"/><path d="M31.9 30.1C26.2 35.7 21.4 43.7 19.1 50h-.6c2.4-6.6 7.4-15 13.4-20.8ZM.2 27.5C6.4 33.7 11.8 43.1 14.1 50h.6C12.3 43 6.6 33 0 26.8Z"/><path d="M.1 29.7c5.4 5.8 10 14 12.4 20.1h.6c-2.4-6.4-7.2-15.1-12.9-21ZM16 .1c-1.2 4.3-3.7 9.5-7 14.3-2.7 4-5.9 7.7-9.1 10.6C7 31.2 13.3 42.2 15.6 49.6c2.4-7.4 8.7-18.2 16.1-24.3C24.4 19.1 18.2 8 16 .1Zm-2.8 22.2V9.9c1.1-2.1 2.1-4.2 2.8-6.2.7 2.1 1.7 4.4 2.9 6.6-.1 3.1-.1 9.8-5.7 12zm5.6 17.1c-1.3 2.2-2.3 4.4-3.2 6.4-.7-1.7-1.5-3.5-2.5-5.4V28.8c4.9 2.2 5.7 7.5 5.7 10.6zM8.7 17.1v16c-2.1-3-4.4-5.8-6.9-8.1 2.5-2.2 4.8-5 6.9-7.9Zm21.2 8.1c-2.5 2.2-5 5.1-7.1 8.1-.8-2.8-2.8-6.2-5.9-8.1 3.7-1.6 5.3-5.2 6-8.2 2 3.1 4.4 6 7 8.2z"/></g></svg>
+    <h2>Access code required</h2>
+    <p>This page contains internal J.&nbsp;J.&nbsp;Keller operational data. Enter the access code you were given.</p>
+    <form id="gate-form">
+      <label for="code">Access code</label>
+      <input id="code" type="password" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button type="submit">View report</button>
+      <div class="err" id="err" role="alert"></div>
+    </form>
+    <p class="note"><b>Note:</b> this gate is client-side only. It stops the page being casually read or indexed, but it is not real security &mdash; anyone who views source can recover the code. Don't put anything more sensitive than the aggregate metrics already here behind it.</p>
+  </div>
+</div>
+
+<div id="content" hidden>
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="brandbar">
+      <span class="chip"><svg viewBox="0 0 32 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g fill="#902147"><path d="M31.9 27.9C25.4 33.9 19.8 43 17.4 50h-.6c2.4-7.1 8.2-16.8 15.1-22.8Z"/><path d="M31.9 30.1C26.2 35.7 21.4 43.7 19.1 50h-.6c2.4-6.6 7.4-15 13.4-20.8ZM.2 27.5C6.4 33.7 11.8 43.1 14.1 50h.6C12.3 43 6.6 33 0 26.8Z"/><path d="M.1 29.7c5.4 5.8 10 14 12.4 20.1h.6c-2.4-6.4-7.2-15.1-12.9-21ZM16 .1c-1.2 4.3-3.7 9.5-7 14.3-2.7 4-5.9 7.7-9.1 10.6C7 31.2 13.3 42.2 15.6 49.6c2.4-7.4 8.7-18.2 16.1-24.3C24.4 19.1 18.2 8 16 .1Zm-2.8 22.2V9.9c1.1-2.1 2.1-4.2 2.8-6.2.7 2.1 1.7 4.4 2.9 6.6-.1 3.1-.1 9.8-5.7 12zm5.6 17.1c-1.3 2.2-2.3 4.4-3.2 6.4-.7-1.7-1.5-3.5-2.5-5.4V28.8c4.9 2.2 5.7 7.5 5.7 10.6zM8.7 17.1v16c-2.1-3-4.4-5.8-6.9-8.1 2.5-2.2 4.8-5 6.9-7.9Zm21.2 8.1c-2.5 2.2-5 5.1-7.1 8.1-.8-2.8-2.8-6.2-5.9-8.1 3.7-1.6 5.3-5.2 6-8.2 2 3.1 4.4 6 7 8.2z"/></g></svg></span>
+      <span class="lockup">
+        <span class="co">J. J. Keller<sup style="font-size:.62em">&reg;</sup></span>
+        <span class="prod">Safety Management Suite</span>
+      </span>
+      <span class="spacer"></span>
+      <span class="conf">Internal &middot; Not for distribution</span>
+    </div>
+
+    <div class="kicker eyebrow"><span class="dot"></span>Trial-to-order diagnostic</div>
+    <h1 class="title">The trial funnel leak</h1>
+    <p class="subhead">Where free-trial signups in SMS stall before becoming a tracked SAP order &mdash; built from the SAP&nbsp;BI EOI reconciliation export and live production subscription data.</p>
+    <div class="meta-row">
+      <span><b>Export window</b> Jul 27 &ndash; Aug 18, 2026</span>
+      <span><b>Volume context</b> Jan 1 &ndash; Aug 27, 2026</span>
+      <span><b>Generated</b> Aug 27, 2026</span>
+      <span><b>For</b> SMS product &amp; ops</span>
+    </div>
+  </div>
+  <div class="masthead-inner hero-stat">
+    <div class="hero-figure">&minus;15<sup>pts</sup></div>
+    <div class="hero-copy">
+      SAP order creation ran at <strong>70&ndash;74% of trials through Q1</strong>, then dropped to <strong>55&ndash;59% in April</strong> and stayed there for four months. Okta account provisioning, meanwhile, has been flat all year &mdash; so this isn't general decay, it's a step-change with a date on it. Across <strong>29,285 trials</strong> this year, that gap plus a chronic 14% Okta failure rate is where the funnel actually leaks.
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <div class="col">
+    <div class="section-head"><span class="section-num">01</span><h2 class="section-title">Executive summary</h2></div>
+    <p>Every SMS subscription &mdash; trial or paid &mdash; is meant to end up as a matched order in SAP. That's how JJK counts it, bills it, and routes it to a rep. The reconciliation export SMS runs against SAP's EOI extract exists to catch the ones that don't make it. In the latest three-week window, <b class="mono">771</b> trials landed on that list out of <b class="mono">2,081</b> created &mdash; roughly <b>one in three</b>.</p>
+    <p>Looking across all <b class="mono">29,285</b> external trials created this year, three drop-off points are unambiguous. <b class="mono">2.9%</b> never get a user record at all. <b class="mono">14.2%</b> get a user record but <b>no Okta account</b> &mdash; meaning they cannot sign in to the product they just signed up for. And <b class="mono">32.8%</b> never get a SAP order attached. (A fourth measure, profile completion, is in dispute &mdash; see Section 03.)</p>
+    <p><b>The single largest finding is a step-change in April.</b> SAP order creation ran at 70&ndash;74% through Q1, then fell to 55&ndash;59% in April and stayed there for four months. Okta provisioning, by contrast, has been flat all year. Something changed in April that is still costing roughly <b>15 points of order conversion on every trial</b>.</p>
+    <p>Two specific days broke outright. On <b>July 9</b>, Okta provisioning failed for ~57 people in three concentrated hourly windows &mdash; worst at 22:00, where only 2 of 22 trials got an account &mdash; while SAP ran normally. On <b>July 15&ndash;16</b>, the reverse: Okta was flawless and SAP order creation collapsed to under 4%, leaving ~200 trials with no order that appear never to have been backfilled.</p>
+    <p>Within the EOI export itself, the stuck trials don't recover on their own: <b class="mono">752 of 768</b> are still on a trial subscription type today and <b class="mono">647</b> have run past their end date without converting.</p>
+    <p>Finally, this report documents what <em>isn't</em> measured &mdash; promo-click attribution and verification-email engagement have no connected data source in this pass. Section 07 lists each gap.</p>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><span class="section-num">02</span><h2 class="section-title">The end-to-end flow</h2></div>
+  <p class="lede">Eight stages from marketing click to counted SAP order, mapped against what actually has a data source behind it today.</p>
+  <div class="funnel-scroll">
+    <div class="funnel">
+      <div class="fnode"><div class="fbox gap"><div class="stage-eyebrow">01 &middot; not connected</div><div class="stage-name">Promo click</div><div class="stage-src">Google Analytics</div></div></div>
+      <div class="fconn">&rarr;</div>
+      <div class="fnode"><div class="fbox measured"><div class="stage-eyebrow">02 &middot; measured</div><div class="stage-name">Trial started in SMS</div><div class="stage-src">SMS DB &middot; 2,081 in window</div></div></div>
+      <div class="fconn">&rarr;</div>
+      <div class="fnode"><div class="fbox gap"><div class="stage-eyebrow">03 &middot; not connected</div><div class="stage-name">Verification email sent / opened</div><div class="stage-src">Acoustic</div></div></div>
+      <div class="fconn">&rarr;</div>
+      <div class="fnode"><div class="fbox critical"><div class="stage-eyebrow">04 &middot; measured</div><div class="stage-name">Okta account created</div><div class="stage-src">SMS DB &middot; 14.2% never get one</div></div></div>
+      <div class="fconn">&rarr;</div>
+      <div class="fnode"><div class="fbox serious"><div class="stage-eyebrow">05 &middot; disputed</div><div class="stage-name">Profile completed</div><div class="stage-src">Definition unresolved &mdash; &sect;03</div></div></div>
+      <div class="fconn">&rarr;</div>
+      <div class="fnode"><div class="fbox measured"><div class="stage-eyebrow">06 &middot; measured</div><div class="stage-name">SAP EOI match attempt</div><div class="stage-src">SAP BI export</div></div></div>
+      <div class="fconn">&rarr;</div>
+      <div class="fnode foutcomes">
+        <div class="fbox good"><div class="stage-eyebrow">outcome &middot; 13.8%</div><div class="stage-name">SAP account + order found</div></div>
+        <div class="fbox serious"><div class="stage-eyebrow">outcome &middot; 4.4%</div><div class="stage-name">Matched, blocked on data</div></div>
+        <div class="fbox critical"><div class="stage-eyebrow">outcome &middot; 81.8%</div><div class="stage-name">No SAP match &mdash; lost</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="funnel-legend">
+    <span><i class="swatch" style="background:var(--brand-line)"></i>Measured today</span>
+    <span><i class="swatch" style="background:var(--gap-ink)"></i>Not connected in this pass</span>
+    <span><i class="swatch" style="background:var(--good)"></i>Recoverable</span>
+    <span><i class="swatch" style="background:var(--serious)"></i>Blocked on data</span>
+    <span><i class="swatch" style="background:var(--critical)"></i>Lost</span>
+  </div>
+  <p class="lede" style="margin-top:22px">Outcome percentages are shares of the <em>stuck</em> population (n&nbsp;=&nbsp;754 external), not of all trials &mdash; Section 03 measures each stage against all 29,285 trials this year. Only stage 03 (verification email) remains fully unmeasured; Okta turned out to be readable directly from the SMS database via the user record's Okta ID, so it is now a hard number rather than a gap.</p>
+</section>
+
+<section>
+  <div class="section-head"><span class="section-num">03</span><h2 class="section-title">Every drop-off point</h2></div>
+  <p class="lede">Each stage measured independently against all <b>29,285</b> external trials created Jan 1 &ndash; Aug 23, 2026. Measured as independent conditions, not a strict sequence &mdash; a trial can clear a later stage while failing an earlier one, and many do.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Gap</th><th>What it means</th><th class="num">Trials</th><th class="num">Share</th><th>Read</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>A.</b> No user record</td>
+          <td>Subscription row exists but no linked <span class="mono">JJK.User</span> &mdash; signup died before an account was made</td>
+          <td class="num">837</td><td class="num">2.9%</td>
+          <td><span class="status-pill live"><i class="dot"></i>Small, steady</span></td>
+        </tr>
+        <tr>
+          <td><b>B.</b> No Okta account</td>
+          <td>User exists but has no <span class="mono">OktaId</span> &mdash; they can't actually sign in</td>
+          <td class="num">4,144</td><td class="num">14.2%</td>
+          <td><span class="status-pill partial"><i class="dot"></i>Chronic ~16%</span></td>
+        </tr>
+        <tr>
+          <td><b>C.</b> No location address</td>
+          <td>Company has no location record carrying a street address and city</td>
+          <td class="num">27,902</td><td class="num">95.3%</td>
+          <td><span class="status-pill missing"><i class="dot"></i>Definition disputed</span></td>
+        </tr>
+        <tr>
+          <td><b>D.</b> No SAP order</td>
+          <td>No <span class="mono">SAPOrderID</span> on the subscription detail row &mdash; never became a counted order</td>
+          <td class="num">9,607</td><td class="num">32.8%</td>
+          <td><span class="status-pill missing"><i class="dot"></i>Regressed in April</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout finding">
+    <b>Gap C needs reconciling before anyone acts on it.</b> This report's proxy for &ldquo;profile completed&rdquo; is whether the company has a location record with a street address and city. That yields <b>95.3% incomplete</b> &mdash; wildly at odds with the <b>24.9% incomplete</b> reported by the EOI export's own <span class="mono">Profile Completed</span> column over the same population. The two are clearly measuring different things, and this report can't tell which one the business means by &ldquo;profile.&rdquo; <b>Treat gap C as an open question, not a finding.</b> Gaps A, B and D are unambiguous.
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Stage completion rate by month, 2026</div>
+    <div class="chart-sub">Share of that month's trials reaching each stage &mdash; both series on one 0&ndash;100% scale</div>
+    <div style="display:grid;grid-template-columns:38px 1fr;gap:10px">
+      <div style="display:flex;flex-direction:column;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-muted);font-variant-numeric:tabular-nums;text-align:right;padding-bottom:2px">
+        <span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0%</span>
+      </div>
+      <svg viewBox="0 0 900 180" preserveAspectRatio="none" style="width:100%;height:200px;display:block" role="img" aria-label="Okta account creation holds steady near 83 percent all year while SAP order creation drops from about 73 percent in the first quarter to about 55 percent from April onward">
+        <line x1="0" y1="10" x2="900" y2="10" stroke="var(--hairline)"/>
+        <line x1="0" y1="52.5" x2="900" y2="52.5" stroke="var(--hairline)"/>
+        <line x1="0" y1="95" x2="900" y2="95" stroke="var(--hairline)"/>
+        <line x1="0" y1="137.5" x2="900" y2="137.5" stroke="var(--hairline)"/>
+        <line x1="0" y1="180" x2="900" y2="180" stroke="var(--baseline)"/>
+        <path d="M 0,39.4 L 128.6,35.8 L 257.1,38.1 L 385.7,41.3 L 514.3,37.2 L 642.9,36.7 L 771.4,40.4 L 900,46.0" fill="none" stroke="var(--s-okta)" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M 0,56.6 L 128.6,61.7 L 257.1,54.4 L 385.7,80.2 L 514.3,86.5 L 642.9,80.4 L 771.4,85.1 L 900,64.9" fill="none" stroke="var(--s-sap)" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="0" cy="39.4" r="4" fill="var(--s-okta)"/><circle cx="128.6" cy="35.8" r="4" fill="var(--s-okta)"/><circle cx="257.1" cy="38.1" r="4" fill="var(--s-okta)"/><circle cx="385.7" cy="41.3" r="4" fill="var(--s-okta)"/><circle cx="514.3" cy="37.2" r="4" fill="var(--s-okta)"/><circle cx="642.9" cy="36.7" r="4" fill="var(--s-okta)"/><circle cx="771.4" cy="40.4" r="4" fill="var(--s-okta)"/><circle cx="900" cy="46.0" r="4" fill="var(--s-okta)"/>
+        <circle cx="0" cy="56.6" r="4" fill="var(--s-sap)"/><circle cx="128.6" cy="61.7" r="4" fill="var(--s-sap)"/><circle cx="257.1" cy="54.4" r="4" fill="var(--s-sap)"/><circle cx="385.7" cy="80.2" r="4" fill="var(--s-sap)"/><circle cx="514.3" cy="86.5" r="4" fill="var(--s-sap)"/><circle cx="642.9" cy="80.4" r="4" fill="var(--s-sap)"/><circle cx="771.4" cy="85.1" r="4" fill="var(--s-sap)"/><circle cx="900" cy="64.9" r="4" fill="var(--s-sap)"/>
+      </svg>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-muted);margin-top:8px;padding-left:48px">
+      <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span>
+    </div>
+    <div class="chart-legend">
+      <span><i class="swatch" style="background:var(--s-okta)"></i>Okta account created &mdash; 82.7% &rarr; 78.8%</span>
+      <span><i class="swatch" style="background:var(--s-sap)"></i>SAP order created &mdash; 72.6% &rarr; 67.7%</span>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>The April step-change is the story in this chart.</b> Okta account creation is flat all year (81&ndash;85%, easing to 78.8% in August). SAP order creation, by contrast, ran at <b>70&ndash;74% through Q1</b> and then dropped to <b>55&ndash;59% from April onward</b> &mdash; and stayed there for four months. That is not gradual decay; it looks like something changed in April. Whatever it was, it is costing roughly <b>15 points of order conversion on every trial since</b>. August's partial recovery to 67.7% is worth understanding too.
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><span class="section-num">04</span><h2 class="section-title">Incident days</h2></div>
+  <p class="lede">Scanning every day in 2026 with at least 40 trials, two dates stand out as genuine breaks rather than noise &mdash; including the one flagged for a closer look.</p>
+
+  <div class="chart-card">
+    <div class="chart-title">July 9, 2026 &mdash; Okta provisioning failure, by hour</div>
+    <div class="chart-sub">155 trials that day &middot; only 98 got an Okta account (63.2% vs ~85% normal) &middot; SAP orders were unaffected</div>
+    <div class="hbar-row"><div class="hbar-label">11:00 &mdash; 15:00 (early)</div><div class="hbar-track"><div class="hbar-fill" style="width:91%;background:var(--good)"></div></div><div class="hbar-val">49/53 <small>&middot; 92%</small></div></div>
+    <div class="hbar-row"><div class="hbar-label">16:00</div><div class="hbar-track"><div class="hbar-fill" style="width:54%;background:var(--serious)"></div></div><div class="hbar-val">14/26 <small>&middot; 54%</small></div></div>
+    <div class="hbar-row"><div class="hbar-label">17:00</div><div class="hbar-track"><div class="hbar-fill" style="width:41%;background:var(--serious)"></div></div><div class="hbar-val">12/29 <small>&middot; 41%</small></div></div>
+    <div class="hbar-row"><div class="hbar-label">18:00 &mdash; 21:00</div><div class="hbar-track"><div class="hbar-fill" style="width:83%;background:var(--good)"></div></div><div class="hbar-val">20/24 <small>&middot; 83%</small></div></div>
+    <div class="hbar-row"><div class="hbar-label">22:00</div><div class="hbar-track"><div class="hbar-fill" style="width:9%;background:var(--critical)"></div></div><div class="hbar-val">2/22 <small>&middot; 9%</small></div></div>
+    <div class="chart-legend"><span>Bars show the share of that hour's trials that received an Okta account.</span></div>
+  </div>
+
+  <div class="callout finding">
+    <b>July 9 was an Okta problem, not a SAP problem.</b> The failure is concentrated in three windows &mdash; 16:00, 17:00, and most severely 22:00, where <b>only 2 of 22 trials</b> got an Okta account. SAP order creation that same day ran at 71%, <em>above</em> the monthly average, so the order path was healthy throughout. Roughly <b>57 people</b> who started a trial on July 9 ended up with a subscription and an order but <b>no way to sign in</b>. Those accounts are individually recoverable if someone provisions them.
+  </div>
+
+  <div class="callout finding">
+    <b>July 15&ndash;16 was the mirror image &mdash; and it is worse.</b> Across those two days, Okta provisioning was <b>flawless (100%: 108/108 and 98/98)</b> while SAP order creation collapsed to <b>1.9% and 3.1%</b> &mdash; 5 orders out of 206 trials. Every other day that month ran 50&ndash;75%. This has all the shape of a two-day SAP integration outage that, as far as this data shows, was never backfilled: those ~200 trials still have no order attached.
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Date</th><th>Trials</th><th>What broke</th><th class="num">Rate</th><th class="num">Normal</th></tr></thead>
+      <tbody>
+        <tr><td>Jul 15, 2026</td><td class="num">108</td><td>SAP order creation</td><td class="num">1.9%</td><td class="num">~56%</td></tr>
+        <tr><td>Jul 16, 2026</td><td class="num">98</td><td>SAP order creation</td><td class="num">3.1%</td><td class="num">~56%</td></tr>
+        <tr><td>Aug 19, 2026</td><td class="num">154</td><td>Okta provisioning</td><td class="num">50.0%</td><td class="num">~83%</td></tr>
+        <tr><td>Jul 9, 2026</td><td class="num">155</td><td>Okta provisioning</td><td class="num">63.2%</td><td class="num">~83%</td></tr>
+        <tr><td>Aug 24, 2026</td><td class="num">83</td><td>Okta provisioning</td><td class="num">56.6%</td><td class="num">~83%</td></tr>
+        <tr><td>Apr 24, 2026</td><td class="num">164</td><td>SAP order creation</td><td class="num">36.0%</td><td class="num">~59%</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="lede">Okta dips in the 50&ndash;65% band recur throughout the year (Jan 16, Feb 23, Mar 27, Apr 16, May 22, Jul 9, Jul 17, Aug 19, Aug 24). That recurrence pattern suggests a systemic provisioning weakness rather than a series of unrelated one-offs.</p>
+</section>
+
+<section>
+  <div class="section-head"><span class="section-num">05</span><h2 class="section-title">Inside the EOI reconciliation export</h2></div>
+  <p class="lede">771 records, Jul 27 &ndash; Aug 18, 2026 (<span class="mono">stuck-sms-no-sap-order_EOI_Match.xlsx</span>). 17 are internal <span class="mono">@jjkeller.com</span> accounts on non-trial material and are excluded from the percentages below.</p>
+
+  <div class="tiles">
+    <div class="tile"><div class="v">754</div><div class="l">External stuck trial records</div></div>
+    <div class="tile"><div class="v">97.9<small>%</small></div><div class="l">on SMS Professional Trial material</div></div>
+    <div class="tile"><div class="v">24.9<small>%</small></div><div class="l">completed their SMS profile</div></div>
+    <div class="tile accent"><div class="v">81.8<small>%</small></div><div class="l">no matching SAP record found</div></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Match outcome, external stuck trials (n = 754)</div>
+    <div class="chart-sub">Result of reconciling each stuck SMS subscription against the SAP BI EOI extract</div>
+    <div class="hbar-row">
+      <div class="hbar-label">No email match in SAP</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:96.9%;background:var(--critical)"></div></div>
+      <div class="hbar-val">617 <small>&middot; 81.8%</small></div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">Matched &mdash; SAP account &amp; order exist</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:16.4%;background:var(--good)"></div></div>
+      <div class="hbar-val">104 <small>&middot; 13.8%</small></div>
+    </div>
+    <div class="hbar-row">
+      <div class="hbar-label">Matched, blocked on a data problem</div>
+      <div class="hbar-track"><div class="hbar-fill" style="width:5.2%;background:var(--serious)"></div></div>
+      <div class="hbar-val">33 <small>&middot; 4.4%</small></div>
+    </div>
+  </div>
+
+  <div class="callout finding">
+    <b>The correlation that matters:</b> among stuck trials that never completed the SMS profile (n&nbsp;=&nbsp;536), <b>99.6% have no SAP match at all</b>. Among those that did complete it (n&nbsp;=&nbsp;188), the no-match rate drops to <b>30.9%</b> and a real SAP order is the single most common outcome (<b>52.7%</b>). Profile completion looks less like a correlate of success and more like a precondition for the SAP sync to have any chance of running.
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Match outcome by profile-completion status</div>
+    <div class="chart-sub">Each bar is 100% of that group &mdash; not overall share</div>
+    <div class="stack-chart">
+      <div class="stack-row">
+        <div class="stack-label"><span>Profile <b>not</b> completed</span><b>n = 536</b></div>
+        <div class="stack-track">
+          <div class="stack-seg critical" style="width:99.63%" title="No SAP match · 534"></div>
+          <div class="stack-seg good" style="width:0.37%" title="Matched, order exists · 2"></div>
+        </div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-label"><span>Profile completed</span><b>n = 188</b></div>
+        <div class="stack-track">
+          <div class="stack-seg critical" style="width:30.85%" title="No SAP match · 58"></div>
+          <div class="stack-seg good" style="width:52.66%" title="Matched, order exists · 99"></div>
+          <div class="stack-seg serious" style="width:16.49%" title="Matched, blocked · 31"></div>
+        </div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-label"><span>Profile status unknown</span><b>n = 30</b></div>
+        <div class="stack-track">
+          <div class="stack-seg critical" style="width:83.33%" title="No SAP match · 25"></div>
+          <div class="stack-seg good" style="width:10%" title="Matched, order exists · 3"></div>
+          <div class="stack-seg serious" style="width:6.67%" title="Matched, blocked · 2"></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-legend">
+      <span><i class="swatch" style="background:var(--critical)"></i>No SAP match</span>
+      <span><i class="swatch" style="background:var(--good)"></i>SAP account &amp; order exist</span>
+      <span><i class="swatch" style="background:var(--serious)"></i>Matched, blocked on data</span>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>They don't recover.</b> Cross-referencing all 768 distinct subscription IDs from this export against live production data today: <b class="mono">752</b> are still on a trial subscription type, and <b class="mono">647</b> have already passed their end date without ever converting. Only 16 sit on a non-trial type &mdash; and those are the internal <span class="mono">@jjkeller.com</span> records. Effectively <b>zero</b> of these stuck external trials converted on their own.
+  </div>
+
+  <p><b>What &ldquo;matched, blocked&rdquo; actually breaks on.</b> For the 33 records that matched a SAP account but produced no order, the export's message text points at two real causes plus one informational tag:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Failure reason</th><th>What it means</th><th class="num">Frequency</th></tr></thead>
+      <tbody>
+        <tr><td>Address fields are blank</td><td>Matched account has no address on file &mdash; SAP can't build an order without one</td><td class="num">most common</td></tr>
+        <tr><td>Region/State not valid in country</td><td>A region code submitted against a country that doesn't recognize it &mdash; fails SAP address validation</td><td class="num">occasional</td></tr>
+        <tr><td>New customer</td><td>Informational tag, not a hard failure &mdash; account has no prior SAP history</td><td class="num">frequent</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><span class="section-num">06</span><h2 class="section-title">Volume in context</h2></div>
+  <p class="lede">How this window sits inside the full year &mdash; queried directly from <span class="mono">Auth.Subscription</span> in production.</p>
+  <div class="tiles">
+    <div class="tile"><div class="v">38,278</div><div class="l">new subscriptions, Jan 1 &ndash; Aug 27, 2026</div></div>
+    <div class="tile"><div class="v">35,823</div><div class="l">of those are trials (93.6%)</div></div>
+    <div class="tile"><div class="v">13,514</div><div class="l">companies on a paid subscription today</div></div>
+    <div class="tile"><div class="v">180</div><div class="l">companies that have trialed more than once</div></div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-title">Weekly trial subscription volume, 2026 year to date</div>
+    <div class="chart-sub">New trial subscriptions per ISO week &middot; shaded band = the EOI export window</div>
+    <div style="display:grid;grid-template-columns:46px 1fr;gap:10px;align-items:stretch">
+      <div style="display:flex;flex-direction:column;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-muted);font-variant-numeric:tabular-nums;text-align:right;padding-bottom:2px">
+        <span>1,200</span><span>900</span><span>600</span><span>300</span><span>0</span>
+      </div>
+      <svg class="spark" viewBox="0 0 900 176" preserveAspectRatio="none" role="img" aria-label="Weekly new trial subscriptions, declining from roughly 1,050 per week through the first quarter to roughly 440 to 570 per week in August">
+        <defs>
+          <linearGradient id="fillgrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-line)" stop-opacity="0.24"/>
+            <stop offset="100%" stop-color="var(--brand-line)" stop-opacity="0.02"/>
+          </linearGradient>
+        </defs>
+        <line x1="0" y1="2.7" x2="900" y2="2.7" stroke="var(--hairline)" stroke-width="1"/>
+        <line x1="0" y1="44.5" x2="900" y2="44.5" stroke="var(--hairline)" stroke-width="1"/>
+        <line x1="0" y1="86.4" x2="900" y2="86.4" stroke="var(--hairline)" stroke-width="1"/>
+        <line x1="0" y1="128.2" x2="900" y2="128.2" stroke="var(--hairline)" stroke-width="1"/>
+        <rect x="794" y="0" width="80" height="170" fill="var(--critical)" opacity="0.08"/>
+        <line x1="0" y1="170" x2="900" y2="170" stroke="var(--baseline)" stroke-width="1"/>
+        <path d="M 0,170 L 0,148.7 L 26.5,24.9 L 52.9,21.7 L 79.4,40.5 L 105.9,47.9 L 132.4,19.5 L 158.8,48.0 L 185.3,27.6 L 211.8,22.9 L 238.2,6.8 L 264.7,21.3 L 291.2,29.1 L 317.6,21.7 L 344.1,81.1 L 370.6,29.1 L 397.1,20.3 L 423.5,7.5 L 450,36.6 L 476.5,41.6 L 502.9,37.3 L 529.4,33.1 L 555.9,62.9 L 582.4,50.9 L 608.8,53.6 L 635.3,51.9 L 661.8,44.0 L 688.2,77.2 L 714.7,67.8 L 741.2,81.3 L 767.6,99.0 L 794.1,78.4 L 820.6,82.2 L 847.1,90.6 L 873.5,97.7 L 900,108.5 L 900,170 Z" fill="url(#fillgrad)"/>
+        <path d="M 0,148.7 L 26.5,24.9 L 52.9,21.7 L 79.4,40.5 L 105.9,47.9 L 132.4,19.5 L 158.8,48.0 L 185.3,27.6 L 211.8,22.9 L 238.2,6.8 L 264.7,21.3 L 291.2,29.1 L 317.6,21.7 L 344.1,81.1 L 370.6,29.1 L 397.1,20.3 L 423.5,7.5 L 450,36.6 L 476.5,41.6 L 502.9,37.3 L 529.4,33.1 L 555.9,62.9 L 582.4,50.9 L 608.8,53.6 L 635.3,51.9 L 661.8,44.0 L 688.2,77.2 L 714.7,67.8 L 741.2,81.3 L 767.6,99.0 L 794.1,78.4 L 820.6,82.2 L 847.1,90.6 L 873.5,97.7 L 900,108.5" fill="none" stroke="var(--brand-line)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="900" cy="108.5" r="4.5" fill="var(--brand-line)"/>
+      </svg>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-muted);margin-top:8px;padding-left:56px">
+      <span>Jan &middot; W1</span><span>Apr</span><span>Jun</span><span>Aug &middot; W35 &middot; 441</span>
+    </div>
+    <div class="chart-legend"><span><i class="swatch" style="background:var(--brand-line)"></i>New trial subscriptions per week</span><span><i class="swatch" style="background:var(--critical);opacity:.3"></i>EOI export window</span></div>
+  </div>
+
+  <div class="callout">
+    <b>Two things worth noting.</b> First, trial volume is <b>down roughly 55%</b> across the year &mdash; from a ~1,050/week plateau through Q1 to ~440&ndash;570/week in August. That decline is outside the scope of this report but probably deserves its own look. Second, with trials making up <b>93.6%</b> of all new subscriptions and only <b class="mono">13,514</b> of <b class="mono">299,809</b> companies on a paid plan, the trial&rarr;paid step is where nearly all of SMS's conversion risk sits.
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><span class="section-num">07</span><h2 class="section-title">Data source coverage</h2></div>
+  <p class="lede">What's wired into this report versus what the whiteboard walkthrough calls for.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Source</th><th>Funnel stage</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>SMS production DB</td><td>Trial creation, profile completion, live status</td><td><span class="status-pill live"><i class="dot"></i>Live</span></td><td>Read-only queries against the SMS production database via Azure AD</td></tr>
+        <tr><td>SAP BI EOI export</td><td>Order match / creation</td><td><span class="status-pill live"><i class="dot"></i>Live</span></td><td>Manual <span class="mono">.xlsx</span> export today; used the Jul 27 &ndash; Aug 18 pull</td></tr>
+        <tr><td>Pendo</td><td>Trial-start click, profile-form engagement</td><td><span class="status-pill partial"><i class="dot"></i>Unreachable</span></td><td>Connector timed out during this session &mdash; retry, not a structural gap</td></tr>
+        <tr><td>Acoustic</td><td>Verification email sent / opened / clicked / bounced</td><td><span class="status-pill missing"><i class="dot"></i>Not connected</span></td><td>No API or export access from this session</td></tr>
+        <tr><td>Okta</td><td>Account creation</td><td><span class="status-pill live"><i class="dot"></i>Live (via SMS DB)</span></td><td>Read from <span class="mono">JJK.User.OktaId</span> &mdash; proves an account exists, but not <em>when</em> it was created or whether a password reset followed. Okta's own API would add that timing.</td></tr>
+        <tr><td>Google Analytics</td><td>Promo click, marketing attribution</td><td><span class="status-pill missing"><i class="dot"></i>Out of scope</span></td><td>Explicitly deferred for this pass</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="section-head"><span class="section-num">08</span><h2 class="section-title">Recommendations</h2></div>
+  <p class="lede">Roughly in priority order &mdash; the first two are cheap and point straight at the biggest number here.</p>
+  <div class="reco-list">
+    <div class="reco">
+      <div class="reco-num">01</div><div class="reco-badge"><span class="badge now">Now</span></div>
+      <div class="reco-body"><h3>Find out what changed in April</h3>
+      <p>SAP order creation dropped from ~73% to ~56% between March and April and has not recovered. On current volumes that is several hundred lost orders a month. Start with the April release notes and any SAP or middleware change in that window &mdash; this one finding likely outweighs everything else in this report.</p></div>
+    </div>
+    <div class="reco">
+      <div class="reco-num">02</div><div class="reco-badge"><span class="badge now">Now</span></div>
+      <div class="reco-body"><h3>Backfill the July 15&ndash;16 SAP outage and provision the July 9 Okta accounts</h3>
+      <p>Two bounded, known lists: ~200 trials with no order from the SAP outage, and ~57 people from July 9 who have a subscription but no way to sign in. Both look recoverable by hand, and neither appears to have been cleaned up.</p></div>
+    </div>
+    <div class="reco">
+      <div class="reco-num">03</div><div class="reco-badge"><span class="badge now">Now</span></div>
+      <div class="reco-body"><h3>Settle what &ldquo;profile completed&rdquo; actually means</h3>
+      <p>This report's location-address proxy says 95% incomplete; the EOI export's own column says 25%. Until someone reconciles those definitions, no one should act on either number &mdash; and the profile stage can't be trusted in any funnel view.</p></div>
+    </div>
+    <div class="reco">
+      <div class="reco-num">04</div><div class="reco-badge"><span class="badge next">Next</span></div>
+      <div class="reco-body"><h3>Alert on daily Okta and SAP completion rates</h3>
+      <p>All four incident days in Section 04 were plainly visible in a daily rate and none appear to have been caught at the time. A simple threshold alert (say, either rate below 70% for a day) would have surfaced every one of them.</p></div>
+    </div>
+    <div class="reco">
+      <div class="reco-num">05</div><div class="reco-badge"><span class="badge next">Next</span></div>
+      <div class="reco-body"><h3>Work the 104 recoverable records from the EOI export</h3>
+      <p>These already have a SAP account <em>and</em> an order &mdash; only the link back to SMS is missing. Highest-value, lowest-effort segment in the export, and a bounded list.</p></div>
+    </div>
+    <div class="reco">
+      <div class="reco-num">06</div><div class="reco-badge"><span class="badge next">Next</span></div>
+      <div class="reco-body"><h3>Validate address and region/country at profile-save time</h3>
+      <p>Blank addresses and invalid region/country pairs account for most of the 33 blocked-but-matched records. Both are catchable in SMS before SAP ever sees the record.</p></div>
+    </div>
+    <div class="reco">
+      <div class="reco-num">07</div><div class="reco-badge"><span class="badge later">Later</span></div>
+      <div class="reco-body"><h3>Investigate the chronic 14% Okta gap</h3>
+      <p>Beyond the incident days, roughly one in seven trials never gets an Okta account at all &mdash; a rate that has held steady all year. Worth understanding whether these are abandoned signups or silent provisioning failures.</p></div>
+    </div>
+    <div class="reco">
+      <div class="reco-num">08</div><div class="reco-badge"><span class="badge later">Later</span></div>
+      <div class="reco-body"><h3>Connect Acoustic, and retry Pendo</h3>
+      <p>Email verification is the last stage with no data behind it at all. Pendo was merely unreachable this session and would show whether people abandon <em>on</em> the profile form or never reach it.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="col">
+    <div class="section-head"><span class="section-num">09</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
+    <p><b>Sources.</b> (1) <span class="mono">stuck-sms-no-sap-order_EOI_Match.xlsx</span> &mdash; a SAP BI EOI reconciliation export covering Jul 27 &ndash; Aug 18, 2026; 771 data rows. (2) Read-only queries against the SMS production database, authenticated via Azure AD; no credentials stored or transmitted.</p>
+    <p><b>The export is a filtered list, not the full population.</b> It contains SMS subscriptions flagged as having no SAP order. SMS-wide, 2,081 trial subscriptions were created in the same window, so the 771 records represent about 37% of trials &mdash; every percentage in Section 03 is a share of that stuck subset, not of all trials.</p>
+    <p><b>External vs. internal.</b> Records with an <span class="mono">@jjkeller.com</span> email are treated as internal (17 of 771) and excluded from Section 03 percentages.</p>
+    <p><b>Match terminology</b> reflects the export's own <span class="mono">Match Status</span> column as produced by the existing reconciliation job; this report did not re-derive match logic independently.</p>
+    <p><b>Stage definitions.</b> Okta account = <span class="mono">JJK.User.OktaId</span> populated. SAP order = <span class="mono">Auth.SubscriptionDetails.SAPOrderID</span> populated. Location address = a non-deleted <span class="mono">CompanyData.Location</span> row with both <span class="mono">Address1</span> and <span class="mono">City</span> non-empty. Stages are evaluated <b>independently</b>, not as a strict sequence &mdash; trials routinely clear one stage while failing an earlier one.</p>
+    <p><b>Provisioning lag guard.</b> Section 03 and the sample CSV exclude trials created after Aug 23 so that asynchronous Okta and SAP provisioning still in flight is not counted as permanent failure. An earlier cut without this guard showed a spike of &ldquo;no Okta account&rdquo; records dated the same day the query ran &mdash; provisioning lag, not failure.</p>
+    <p><b>Not included:</b> Pendo (connector unreachable this session), Acoustic, and Google Analytics (no connected data source for this pass). Those stages are marked as gaps rather than estimated. Okta was originally expected to be a gap but proved readable from the SMS database.</p>
+    <p><b>&ldquo;Companies on a paid subscription&rdquo;</b> counts non-deleted companies whose current subscription row points at a non-trial subscription type. SMS keeps a single current-subscription pointer per company rather than a history, so all such counts are status snapshots, not point-in-time series.</p>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <div class="inner">
+    <span>J. J. Keller<sup>&reg;</sup> Safety Management Suite &mdash; internal analysis</span>
+    <span class="spacer"></span>
+    <span>Source data as of Aug 27, 2026</span>
+  </div>
+</footer>
+</div>
+
+<script>
+(function(){
+  var CODE = "jjktrialfunnelproto2026";
+  var gate = document.getElementById("gate");
+  var content = document.getElementById("content");
+  var form = document.getElementById("gate-form");
+  var input = document.getElementById("code");
+  var err = document.getElementById("err");
+
+  function unlock(){
+    gate.remove();
+    content.hidden = false;
+    document.body.classList.remove("locked");
+  }
+  try{
+    if (sessionStorage.getItem("sms-tf-ok") === "1"){ unlock(); return; }
+  }catch(e){}
+
+  form.addEventListener("submit", function(ev){
+    ev.preventDefault();
+    if (input.value.trim().toLowerCase() === CODE){
+      try{ sessionStorage.setItem("sms-tf-ok","1"); }catch(e){}
+      unlock();
+    } else {
+      err.textContent = "That code doesn't match. Check it and try again.";
+      input.select();
+    }
+  });
+  input.focus();
+})();
+</script>
+</body>
+</html>
