@@ -291,7 +291,7 @@
       <b>Active incident, today.</b> On <b>27 August</b>, 116 self-registration trials were created and all 116 were sent to SAP, but <b>only 23 received a SAP order &mdash; 93 are stuck (80%)</b>. The previous day converted 149 of 185 (81%), and the pipeline normally clears within a day, so this is an <b>outage in progress, not processing lag</b>. Profile completion that day was healthy at 86%, so the fault is isolated to the SAP leg. <b>These 93 trials need reconciling, plus any 28 August backlog.</b>
     </div>
 
-    <p><b>The April step-change now has an answer.</b> SAP order creation ran at 70&ndash;74% through Q1 and fell to 55&ndash;59% from April. The cause was not a bug: it was the <b>SIGNUP_FLOW_CHANGE rollout</b>, which made email verification mandatory &mdash; from a ~7&ndash;9% pilot in Q1 to 72.5% in April and 100% from May. Adding that step introduced a new leak and depressed everything downstream of it. Earlier drafts of this report called April &ldquo;unexplained&rdquo; and proposed two wrong causes; &sect;03 sets out what actually happened.</p>
+    <p><b>The April step-change has a proposed answer</b> &mdash; <em>reported, not verified by this report (&sect;13)</em>. SAP order creation ran at 70&ndash;74% through Q1 and fell to 55&ndash;59% from April. The cause was not a bug: it was the <b>SIGNUP_FLOW_CHANGE rollout</b>, which made email verification mandatory &mdash; from a ~7&ndash;9% pilot in Q1 to 72.5% in April and 100% from May. Adding that step introduced a new leak and depressed everything downstream of it. Earlier drafts of this report called April &ldquo;unexplained&rdquo; and proposed two wrong causes; &sect;03 sets out what actually happened.</p>
 
     <p><b>And the profile step has since been fixed.</b> Profile completion per account fell from ~75% pre-April to ~57% through May&ndash;July, then recovered sharply after the <b>18 and 25 August deploys</b> to <b>84&ndash;89%</b> &mdash; better than the pre-April baseline. That is the clearest win in this report, and it is recent enough that most people have not seen it yet.</p>
     <p>Two specific days broke outright. On <b>July 9</b>, Okta provisioning failed for ~57 people in three concentrated hourly windows &mdash; worst at 22:00, where only 2 of 22 trials got an account &mdash; while SAP ran normally. Marketing has since confirmed the Acoustic email template was changed <em>that same day</em>, which would explain it: no click, no Okta account. On <b>July 15&ndash;16</b>, the reverse pattern &mdash; Okta flawless, SAP order creation collapsed to under 4%, leaving ~200 trials with no order that appear never to have been backfilled.</p>
@@ -316,12 +316,15 @@
     <li><a href="#s10"><span class="n">10</span><span class="t">The welcome email</span><span class="d">Acoustic data; the duplicate-send window measured</span></a></li>
     <li><a href="#s11"><span class="n">11</span><span class="t">The authentication errors</span><span class="d">12,000+ failures on sign-in and sign-up</span></a></li>
     <li><a href="#s12"><span class="n">12</span><span class="t">Data source coverage</span><span class="d">What's wired, what's blind, and why</span></a></li>
-    <li><a href="#s13" class="hot"><span class="n">13</span><span class="t">Issue register</span><span class="d">Every tracked issue, plus claims this report reversed</span></a></li>
-    <li><a href="#s14"><span class="n">14</span><span class="t">Recommendations</span><span class="d">Now / Next / Later</span></a></li>
-    <li><a href="#s15"><span class="n">15</span><span class="t">Methodology &amp; caveats</span><span class="d">Sources, exclusions, and known limits</span></a></li>
+    <li><a href="#s13"><span class="n">13</span><span class="t">Provenance of every claim</span><span class="d"></span></a></li>
+    <li><a href="#s14" class="hot"><span class="n">14</span><span class="t">Issue register</span><span class="d">Every tracked issue, plus claims this report reversed</span></a></li>
+    <li><a href="#s15"><span class="n">15</span><span class="t">Recommendations</span><span class="d">Now / Next / Later</span></a></li>
+    <li><a href="#s16"><span class="n">16</span><span class="t">Methodology &amp; caveats</span><span class="d">Sources, exclusions, and known limits</span></a></li>
   </ol>
   <div class="toc-foot"><b>If you read three things:</b> the active SAP outage in &sect;01, &sect;03 on what April actually was, and the reversals at the end of the issue register.</div>
 </div>
+
+
 
 
 
@@ -373,7 +376,7 @@
   <p class="lede">A dedicated daily funnel analysis of self-registered users &mdash; a cleaner instrument than anything else in this report &mdash; identifies the April change and closes the question this report has carried since the first draft.</p>
 
   <div class="callout finding">
-    <b>April was the SIGNUP_FLOW_CHANGE verification rollout.</b> A mandatory email-verification step went from a <b>~7&ndash;9% pilot</b> in Jan&ndash;Mar to <b>72.5% of traffic in April</b> and <b>100% from May</b>. Verification-code volume jumped from ~0.5k/month to ~5&ndash;6k/month. This was a deliberate product change, not a fault &mdash; but it added a step, and the funnel lost people at it.
+    <b>April was the SIGNUP_FLOW_CHANGE verification rollout</b> &mdash; per the <em>Findings</em> tab of the supplied funnel workbook, <b>not independently verified here</b> (&sect;13). A mandatory email-verification step went from a <b>~7&ndash;9% pilot</b> in Jan&ndash;Mar to <b>72.5% of traffic in April</b> and <b>100% from May</b>. Verification-code volume jumped from ~0.5k/month to ~5&ndash;6k/month. This was a deliberate product change, not a fault &mdash; but it added a step, and the funnel lost people at it.
   </div>
 
   <div class="table-wrap">
@@ -403,7 +406,7 @@
   </div>
 
   <div class="callout finding">
-    <b>The SAP leg has its own chronic fault, independent of all of the above.</b> Structurally, <b>20&ndash;35% of self-registration trials are marked &ldquo;sent to SAP&rdquo; but never receive a SAPOrderID</b> &mdash; a chronic ~32% gap, worsening to ~41&ndash;45% since April. The root cause is on record: <b>the SAP submit is a client-side fire-and-forget call with no retry</b>. Nothing detects or replays a failed submit, which is why these trials sit stuck indefinitely rather than self-healing, and why the 15&ndash;16 July and 27 August outages produced permanent orphans rather than delayed orders.
+    <b>The SAP leg has its own chronic fault, independent of all of the above.</b> Structurally, <b>20&ndash;35% of self-registration trials are marked &ldquo;sent to SAP&rdquo; but never receive a SAPOrderID</b> &mdash; a chronic ~32% gap, worsening to ~41&ndash;45% since April. The root cause <b>as stated in the supplied analysis</b> (not verified here, &sect;13): the SAP submit is a client-side fire-and-forget call with no retry. Nothing detects or replays a failed submit, which is why these trials sit stuck indefinitely rather than self-healing, and why the 15&ndash;16 July and 27 August outages produced permanent orphans rather than delayed orders.
   </div>
 
   <div class="callout">
@@ -899,7 +902,69 @@
 </section>
 
 <section id="s13">
-  <div class="section-head"><span class="section-num">13</span><h2 class="section-title">Issue register</h2></div>
+  <div class="section-head"><span class="section-num">13</span><h2 class="section-title">Provenance of every claim</h2></div>
+  <p class="lede">This report mixes figures measured from data with statements taken from meetings, email and third-party analysis. Blending those in one narrative makes the whole thing read as equally solid, which it is not. Every claim is listed below with its actual source, so anyone can discount the ones that were never independently checked.</p>
+
+  <div class="tiles">
+    <div class="tile"><div class="v">17</div><div class="l"><b>Measured</b> &mdash; from a query or source file; re-runnable</div></div>
+    <div class="tile"><div class="v">14</div><div class="l"><b>Reported</b> &mdash; from a transcript, email or someone else's analysis</div></div>
+    <div class="tile"><div class="v">4</div><div class="l"><b>Inferred</b> &mdash; this report's own reasoning, not a measurement</div></div>
+  </div>
+
+  <div class="callout finding">
+    <b>The most important item in this table is the April explanation.</b> &ldquo;April was the SIGNUP_FLOW_CHANGE verification rollout&rdquo; is presented elsewhere in this report as the answer to its central question. It came from the <em>Findings</em> tab of a supplied funnel workbook &mdash; an analyst's narrative, not raw data &mdash; and <b>was not independently verified here</b>. The flag's existence and rollout dates were never confirmed against the codebase or a deployment record. The same applies to &ldquo;the SAP submit is fire-and-forget with no retry&rdquo;, which is quoted as a root cause. Both may well be correct. Neither is evidence produced by this report.
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Claim</th><th>Actual source</th><th>Type</th><th>Independently verifiable?</th></tr></thead>
+      <tbody>
+        <tr><td>38,278 subscriptions created 1 Jan - 27 Aug 2026</td><td>Prod SQL (Q2)</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - re-run Q2</td></tr>
+        <tr><td>35,823 of those are trials (93.6%)</td><td>Prod SQL (Q3)</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - re-run Q3</td></tr>
+        <tr><td>13,514 of 299,809 companies on a paid plan</td><td>Prod SQL (Q4)</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - re-run Q4</td></tr>
+        <tr><td>14.2% of trials have no OktaId</td><td>Prod SQL (Q5)</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - re-run Q5</td></tr>
+        <tr><td>32.8% of trials have no SAPOrderID</td><td>Prod SQL (Q5)</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - re-run Q5</td></tr>
+        <tr><td>Monthly SAP order rate 72.6/69.6/73.9/58.7/55.0/58.6/55.8/67.7</td><td>Prod SQL (Q6)</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - re-run Q6</td></tr>
+        <tr><td>Okta provisioning flat 81-85% all year</td><td>Prod SQL (Q6)</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - re-run Q6</td></tr>
+        <tr><td>Incident days 15-16 Jul, 9 Jul, 19 Aug, 24 Aug, 24 Apr</td><td>Prod SQL (Q6/Q7)</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - re-run Q6</td></tr>
+        <tr><td>EOI export: 771 rows, 754 external, 617/104/33 match split</td><td>EOI xlsx</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - tab 05</td></tr>
+        <tr><td>Leads 23,571; monthly 3546..1926; campaign declines</td><td>Leads xlsx</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - tabs 06/07</td></tr>
+        <tr><td>Acoustic duplicates: 990 recipients, 993 extra copies, 17 Jun - 1 Jul</td><td>Acoustic txt</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - tabs 09/10</td></tr>
+        <tr><td>Acoustic engagement by month (open/click rates)</td><td>Acoustic txt</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - tab 08</td></tr>
+        <tr><td>Verification email is sent by Okta (noreply@login.jjkeller.com), code-based, no link</td><td>verificationemail.txt (raw message)</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - read the file</td></tr>
+        <tr><td>Pendo has zero SMS events across 3 years</td><td>Pendo API</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - tab 11</td></tr>
+        <tr><td>Elastic SMS_Web_UI has 0 transactions / 111,411 errors in 90d</td><td>Elastic API</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - tab 11</td></tr>
+        <tr><td>27 Aug: 116 trials, 116 sent to SAP, 23 orders</td><td>Supplied funnel CSV (tab 1, daily)</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - arithmetic on the supplied daily file</td></tr>
+        <tr><td>Profile-per-account 57% -&gt; 73% -&gt; 84-89% across Aug</td><td>Supplied funnel CSV (tab 1, daily)</td><td><span class="status-pill live"><i class="dot"></i>Measured</span></td><td>Yes - arithmetic on the supplied daily file</td></tr>
+        <tr><td>April change was the SIGNUP_FLOW_CHANGE verification rollout</td><td>Supplied funnel workbook, Findings tab (analyst narrative)</td><td><span class="status-pill partial"><i class="dot"></i>Reported</span></td><td>No - Claude did not confirm the flag exists or its rollout dates</td></tr>
+        <tr><td>SAP submit is client-side fire-and-forget with no retry</td><td>Supplied funnel workbook, Findings tab (analyst narrative)</td><td><span class="status-pill partial"><i class="dot"></i>Reported</span></td><td>No - Claude did not read the code</td></tr>
+        <tr><td>Chronic 20-35% sent-to-SAP-without-order gap</td><td>Supplied funnel workbook, Findings tab</td><td><span class="status-pill partial"><i class="dot"></i>Reported</span></td><td>No - not recomputed from the daily file</td></tr>
+        <tr><td>12,000+ authentication failures in 30 days</td><td>Email thread 26-27 Aug</td><td><span class="status-pill partial"><i class="dot"></i>Reported</span></td><td>No - workbook never supplied</td></tr>
+        <tr><td>Auth failures ongoing since at least April</td><td>Email thread 26-27 Aug</td><td><span class="status-pill partial"><i class="dot"></i>Reported</span></td><td>No</td></tr>
+        <tr><td>Acoustic template changed on 9 July</td><td>Meeting 27 Aug (attributed to marketing)</td><td><span class="status-pill partial"><i class="dot"></i>Reported</span></td><td>No - Claude has no Acoustic template history</td></tr>
+        <tr><td>Duplicate emails affected ~10,000 recipients</td><td>Meeting 27 Aug</td><td><span class="status-pill missing"><i class="dot"></i>Contradicted</span></td><td>Measured as 990 - see tab 10</td></tr>
+        <tr><td>Duplicate sends caused by promo-code release in April</td><td>Meeting 27 Aug</td><td><span class="status-pill missing"><i class="dot"></i>Contradicted</span></td><td>Measured window is 17 Jun - 1 Jul - see tab 09</td></tr>
+        <tr><td>Retry logic still unfixed (only the column was added)</td><td>Meeting 27 Aug</td><td><span class="status-pill partial"><i class="dot"></i>Reported</span></td><td>No - Claude did not read the code</td></tr>
+        <tr><td>Call-to-action pushed below the fold (150% zoom)</td><td>Meeting 27 Aug, from memory</td><td><span class="status-pill partial"><i class="dot"></i>Reported</span></td><td>No - no date, no data</td></tr>
+        <tr><td>Okta login loop, believed fixed</td><td>Meeting 27 Aug, from memory</td><td><span class="status-pill partial"><i class="dot"></i>Reported</span></td><td>No - no date, no data</td></tr>
+        <tr><td>Trial length 7 days config vs 30 days marketing</td><td>Process map / meeting</td><td><span class="status-pill partial"><i class="dot"></i>Reported</span></td><td>No - deployment setting not in source control</td></tr>
+        <tr><td>Stage 6 (profile) triggers the SAP order</td><td>Process map diagram</td><td><span class="status-pill partial"><i class="dot"></i>Reported</span></td><td>No - Claude did not read the code</td></tr>
+        <tr><td>Stages 3-4 emit no telemetry</td><td>Process map diagram</td><td><span class="status-pill partial"><i class="dot"></i>Reported</span></td><td>Consistent with Elastic/Pendo zero-event findings, but not directly verified</td></tr>
+        <tr><td>Elastic RUM apm.init() placement is the likely cause of zero transactions</td><td>Claude inference from app.module.ts</td><td><span class="status-pill partial"><i class="dot"></i>Inferred</span></td><td>No - never tested</td></tr>
+        <tr><td>Auth failures are the same phenomenon as the email-to-account leak</td><td>Claude inference</td><td><span class="status-pill partial"><i class="dot"></i>Inferred</span></td><td>No - needs the auth workbook</td></tr>
+        <tr><td>9 July template change caused the 9 July Okta failure</td><td>Claude inference</td><td><span class="status-pill missing"><i class="dot"></i>Retracted</span></td><td>Retracted: verification email is Okta-sent with no link</td></tr>
+        <tr><td>Volume decline is demand-side because trials -45% and leads -46% move together</td><td>Claude inference from measured counts</td><td><span class="status-pill partial"><i class="dot"></i>Inferred</span></td><td>Inputs are measured; the causal reading is an inference</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <b>Where measurement disagreed with what was reported</b>, the measured figure is used and the difference is noted: duplicate emails were <b>990 recipients over 17 Jun &ndash; 1 Jul</b>, not ~10,000 in April. One claim of this report's own &mdash; that the 9 July template change caused the 9 July Okta failure &mdash; was <b>retracted</b> after the verification email turned out to be Okta-sent with no link to click.
+  </div>
+</section>
+
+<section id="s14">
+  <div class="section-head"><span class="section-num">14</span><h2 class="section-title">Issue register</h2></div>
   <p class="lede">All twenty tracked issues in one place, with what broke, when it started, and whether it is closed &mdash; the format agreed in the Aug 27 process-mapping session. Maintained as a shared spreadsheet; this table is the snapshot.</p>
 
   <div class="table-wrap">
@@ -939,8 +1004,8 @@
   </div>
 </section>
 
-<section id="s14">
-  <div class="section-head"><span class="section-num">14</span><h2 class="section-title">Recommendations</h2></div>
+<section id="s15">
+  <div class="section-head"><span class="section-num">15</span><h2 class="section-title">Recommendations</h2></div>
   <p class="lede">Roughly in priority order &mdash; the first two are cheap and point straight at the biggest number here.</p>
   <div class="reco-list">
     <div class="reco">
@@ -996,9 +1061,9 @@
   </div>
 </section>
 
-<section id="s15">
+<section id="s16">
   <div class="col">
-    <div class="section-head"><span class="section-num">15</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
+    <div class="section-head"><span class="section-num">16</span><h2 class="section-title">Methodology &amp; caveats</h2></div>
     <p><b>Sources.</b> (0) <span class="mono">Leads And Orders - All Leads.xlsx</span> &mdash; 23,571 SAP lead records with campaign attribution, Jan 1 &ndash; Aug 26, 2026. (1) <span class="mono">stuck-sms-no-sap-order_EOI_Match.xlsx</span> &mdash; a SAP BI EOI reconciliation export covering Jul 27 &ndash; Aug 18, 2026; 771 data rows. (2) Read-only queries against the SMS production database, authenticated via Azure AD; no credentials stored or transmitted.</p>
     <p><b>The export is a filtered list, not the full population.</b> It contains SMS subscriptions flagged as having no SAP order. SMS-wide, 2,081 trial subscriptions were created in the same window, so the 771 records represent about 37% of trials &mdash; every percentage in Section 03 is a share of that stuck subset, not of all trials.</p>
     <p><b>External vs. internal.</b> Records with an <span class="mono">@jjkeller.com</span> email are treated as internal (17 of 771) and excluded from Section 03 percentages.</p>
